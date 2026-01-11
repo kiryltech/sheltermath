@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shelter Math - Financial Cockpit</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5048e5",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#121121", // Approximating the requested zinc-950 feel within theme
+                        "surface-dark": "#18181b", // zinc-900 equivalent for sidebar
+                        "surface-highlight": "#27272a", // zinc-800
+                        "buy": "#f97316", // orange-500
+                        "rent": "#22d3ee", // cyan-400
+                        "crossover": "#34d399", // emerald-400
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for sidebar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #18181b; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3f3f46; 
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #52525b; 
+        }
+        
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none; 
+            width: 100%; 
+            background: transparent; 
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #5048e5;
+            cursor: pointer;
+            margin-top: -6px; 
+            border: 2px solid #18181b;
+        }
+        
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #3f3f46;
+            border-radius: 2px;
+        }
+        
+        /* Focus styles for range */
+        input[type=range]:focus::-webkit-slider-thumb {
+            box-shadow: 0 0 0 2px #3730a3;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden h-screen flex flex-col md:flex-row">
+<!-- SIDEBAR: The Knobs -->
+<aside class="w-full md:w-[320px] flex-shrink-0 bg-surface-dark border-r border-white/5 flex flex-col h-full z-20 shadow-xl overflow-hidden">
+<!-- Header -->
+<div class="px-6 py-5 border-b border-white/5 bg-surface-dark/50 backdrop-blur-sm sticky top-0 z-10 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">domain</span>
+<div>
+<h1 class="text-sm font-bold tracking-tight text-white uppercase">Shelter Math</h1>
+<p class="text-xs text-zinc-500 font-mono">v2.4.0_beta</p>
+</div>
+</div>
+</div>
+<!-- Scrollable Inputs Area -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
+<!-- Section: Property -->
+<div class="space-y-5">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-zinc-500" style="font-size: 18px;">home</span>
+<h2 class="text-xs font-bold uppercase tracking-wider text-zinc-500">Property Basics</h2>
+</div>
+<!-- Input Group: Home Price -->
+<div class="group">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-zinc-300">Home Price</label>
+<div class="relative">
+<span class="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">$</span>
+<input class="w-28 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 pl-5 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all" type="text" value="850,000"/>
+</div>
+</div>
+<input class="w-full accent-primary" max="2000000" min="100000" type="range" value="850000"/>
+</div>
+<!-- Input Group: Down Payment -->
+<div class="group">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-zinc-300">Down Payment</label>
+<div class="flex items-center gap-2">
+<span class="text-xs text-zinc-500 font-mono tabular-nums">$170k</span>
+<div class="relative">
+<input class="w-16 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all" type="text" value="20"/>
+<span class="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">%</span>
+</div>
+</div>
+</div>
+<input class="w-full accent-primary" max="100" min="0" type="range" value="20"/>
+</div>
+<!-- Input Group: Mortgage Rate -->
+<div class="group">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-zinc-300">Interest Rate</label>
+<div class="relative">
+<input class="w-20 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all" type="text" value="6.875"/>
+<span class="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">%</span>
+</div>
+</div>
+<input class="w-full accent-primary" max="12" min="2" step="0.125" type="range" value="6.875"/>
+</div>
+</div>
+<hr class="border-white/5"/>
+<!-- Section: Rental Market -->
+<div class="space-y-5">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-zinc-500" style="font-size: 18px;">apartment</span>
+<h2 class="text-xs font-bold uppercase tracking-wider text-zinc-500">Rental Market</h2>
+</div>
+<!-- Input Group: Monthly Rent -->
+<div class="group">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-zinc-300">Monthly Rent</label>
+<div class="relative">
+<span class="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">$</span>
+<input class="w-24 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 pl-5 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all" type="text" value="4,200"/>
+</div>
+</div>
+<input class="w-full accent-primary" max="10000" min="1000" step="50" type="range" value="4200"/>
+</div>
+<!-- Input Group: Rent Inflation -->
+<div class="group">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-zinc-300">Rent Inflation</label>
+<div class="relative">
+<input class="w-16 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all" type="text" value="3.5"/>
+<span class="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">%</span>
+</div>
+</div>
+<input class="w-full accent-primary" max="15" min="0" step="0.1" type="range" value="3.5"/>
+</div>
+</div>
+<hr class="border-white/5"/>
+<!-- Section: Market Assumptions -->
+<div class="space-y-5 pb-10">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-zinc-500" style="font-size: 18px;">trending_up</span>
+<h2 class="text-xs font-bold uppercase tracking-wider text-zinc-500">Forecasts</h2>
+</div>
+<!-- Input Group: Home Appreciation -->
+<div class="group">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-zinc-300">Home Appreciation</label>
+<div class="relative">
+<input class="w-16 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all" type="text" value="4.0"/>
+<span class="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">%</span>
+</div>
+</div>
+<input class="w-full accent-primary" max="10" min="0" step="0.1" type="range" value="4.0"/>
+</div>
+<!-- Input Group: Investment Return -->
+<div class="group">
+<div class="flex justify-between items-center mb-2">
+<label class="text-sm font-medium text-zinc-300">Investment Return</label>
+<div class="relative">
+<input class="w-16 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all" type="text" value="7.0"/>
+<span class="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">%</span>
+</div>
+</div>
+<input class="w-full accent-primary" max="15" min="0" step="0.1" type="range" value="7.0"/>
+</div>
+</div>
+</div>
+</aside>
+<!-- MAIN: The Simulation -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- Header / Verdict Bar -->
+<header class="h-auto border-b border-white/5 bg-background-dark/80 backdrop-blur px-6 py-4 flex flex-col gap-4 z-10">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                        The Verdict
+                        <span class="px-2 py-0.5 rounded-full bg-surface-highlight text-[10px] text-zinc-400 font-mono border border-white/5 uppercase tracking-wide">30 Year Outlook</span>
+</h2>
+<p class="text-sm text-zinc-400 mt-1">Comparing total financial outcome of buying this property vs. renting and investing the difference.</p>
+</div>
+<div class="flex items-center gap-4">
+<!-- Segmented Control -->
+<div class="bg-surface-dark p-1 rounded-lg flex border border-white/5">
+<button class="px-3 py-1 text-xs font-medium text-white bg-white/10 rounded shadow-sm">10Y</button>
+<button class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors">20Y</button>
+<button class="px-3 py-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors">30Y</button>
+</div>
+<!-- Primary Action -->
+<button class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-[0_0_15px_-3px_rgba(80,72,229,0.3)]">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                        AI Analysis
+                    </button>
+</div>
+</div>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+<!-- Card 1 -->
+<div class="bg-surface-dark/50 border border-white/5 rounded-lg p-3 flex flex-col relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-r from-crossover/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="text-xs text-zinc-500 uppercase font-semibold tracking-wider z-10">Crossover Point</span>
+<div class="flex items-baseline gap-2 mt-1 z-10">
+<span class="text-2xl font-bold text-white font-mono tabular-nums">Year 4</span>
+<span class="text-xs text-crossover font-medium flex items-center">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                            Breakeven
+                        </span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-dark/50 border border-white/5 rounded-lg p-3 flex flex-col relative overflow-hidden">
+<span class="text-xs text-zinc-500 uppercase font-semibold tracking-wider">Net Worth Delta</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-2xl font-bold text-buy font-mono tabular-nums">+$482,050</span>
+<span class="text-xs text-zinc-400">Favoring Buy</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-dark/50 border border-white/5 rounded-lg p-3 flex flex-col relative overflow-hidden">
+<span class="text-xs text-zinc-500 uppercase font-semibold tracking-wider">Unrecoverable Costs</span>
+<div class="mt-1 flex gap-4 text-xs font-mono tabular-nums">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-buy"></div>
+<span class="text-zinc-300">$1.2M</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-rent"></div>
+<span class="text-zinc-300">$1.8M</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Charts Area -->
+<div class="flex-1 overflow-y-auto p-6 grid grid-rows-2 gap-6">
+<!-- Chart 1: Net Worth Projection -->
+<div class="flex flex-col min-h-[300px] bg-surface-dark/30 border border-white/5 rounded-xl p-5 relative">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-sm font-semibold text-white">Net Worth Projection</h3>
+<p class="text-xs text-zinc-500 mt-0.5">Accumulated wealth over time (Property Equity vs. Portfolio Value)</p>
+</div>
+<div class="flex items-center gap-4 text-xs font-medium">
+<div class="flex items-center gap-2">
+<div class="w-3 h-0.5 bg-buy"></div>
+<span class="text-zinc-300">Buying</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-0.5 bg-rent"></div>
+<span class="text-zinc-300">Renting</span>
+</div>
+</div>
+</div>
+<!-- Mock Chart Area -->
+<div class="flex-1 w-full relative">
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="w-full h-px bg-white/5"></div>
+<div class="w-full h-px bg-white/5"></div>
+<div class="w-full h-px bg-white/5"></div>
+<div class="w-full h-px bg-white/5"></div>
+<div class="w-full h-px bg-white/5"></div>
+</div>
+<!-- SVG Chart -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 100 100">
+<!-- Buying Line (Orange) - Curved upward -->
+<path d="M0,90 C20,85 40,70 60,50 S80,20 100,5" fill="none" stroke="#f97316" stroke-width="0.8" vector-effect="non-scaling-stroke"></path>
+<!-- Buying Area Fill -->
+<path d="M0,90 C20,85 40,70 60,50 S80,20 100,5 V100 H0 Z" fill="url(#gradBuy)" opacity="0.1"></path>
+<!-- Renting Line (Cyan) - Linear growth -->
+<path d="M0,82 L100,45" fill="none" stroke="#22d3ee" stroke-dasharray="2,1" stroke-width="0.8" vector-effect="non-scaling-stroke"></path>
+<!-- Crossover Point Marker -->
+<circle cx="15" cy="78" fill="#34d399" r="1.5" stroke="#121121" stroke-width="0.5"></circle>
+<line stroke="#34d399" stroke-dasharray="1,1" stroke-width="0.3" vector-effect="non-scaling-stroke" x1="15" x2="15" y1="78" y2="100"></line>
+<!-- Gradients -->
+<defs>
+<lineargradient id="gradBuy" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#f97316;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#f97316;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+</svg>
+<!-- Tooltip Mockup -->
+<div class="absolute top-[40%] left-[60%] bg-zinc-900 border border-zinc-700 p-2 rounded shadow-xl z-20 pointer-events-none hidden md:block">
+<p class="text-[10px] text-zinc-400 font-mono mb-1">Year 18</p>
+<div class="flex items-center justify-between gap-4 text-xs font-mono">
+<span class="text-buy">Buy: $1.24M</span>
+</div>
+<div class="flex items-center justify-between gap-4 text-xs font-mono mt-0.5">
+<span class="text-rent">Rent: $980k</span>
+</div>
+</div>
+</div>
+<!-- X-Axis Labels -->
+<div class="flex justify-between mt-2 text-[10px] text-zinc-600 font-mono">
+<span>Year 0</span>
+<span>Year 5</span>
+<span>Year 10</span>
+<span>Year 15</span>
+<span>Year 20</span>
+<span>Year 25</span>
+<span>Year 30</span>
+</div>
+</div>
+<!-- Chart 2: Monthly Cost Breakdown -->
+<div class="flex flex-col min-h-[300px] bg-surface-dark/30 border border-white/5 rounded-xl p-5">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-sm font-semibold text-white">Monthly Unrecoverable Costs</h3>
+<p class="text-xs text-zinc-500 mt-0.5">Interest + Taxes + Maintenance vs. Rent Payment</p>
+</div>
+<div class="flex items-center gap-4 text-xs font-medium">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-rent rounded-sm opacity-80"></div>
+<span class="text-zinc-300">Rent</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-red-400 rounded-sm opacity-80"></div>
+<span class="text-zinc-300">Interest</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-indigo-400 rounded-sm opacity-80"></div>
+<span class="text-zinc-300">Tax/Maint</span>
+</div>
+</div>
+</div>
+<!-- Mock Bar Chart -->
+<div class="flex-1 w-full flex items-end justify-between gap-2 md:gap-4 relative px-2">
+<!-- Dotted Line for current rent -->
+<div class="absolute w-full border-t border-dashed border-rent/50 top-[40%] left-0 pointer-events-none flex items-end justify-end">
+<span class="text-[10px] text-rent bg-background-dark px-1 -mt-5 mr-2">Rent Baseline</span>
+</div>
+<!-- Bar Group 1: Year 1 -->
+<div class="flex flex-col items-center flex-1 h-full justify-end group">
+<div class="w-full max-w-[40px] flex flex-col gap-0.5 h-[80%] opacity-90 hover:opacity-100 transition-opacity cursor-pointer">
+<div class="bg-red-400 w-full h-[60%] rounded-t-sm relative group-hover:after:content-['$3.2k'] group-hover:after:absolute group-hover:after:-top-6 group-hover:after:left-1/2 group-hover:after:-translate-x-1/2 group-hover:after:text-[10px] group-hover:after:text-white group-hover:after:bg-zinc-800 group-hover:after:px-1 group-hover:after:rounded"></div>
+<div class="bg-indigo-400 w-full h-[25%]"></div>
+<div class="bg-buy/20 w-full h-[15%] rounded-b-sm border-t border-white/10" title="Equity (Recoverable)"></div>
+</div>
+<span class="mt-2 text-[10px] text-zinc-500 font-mono">Y1</span>
+</div>
+<!-- Bar Group 2: Year 5 -->
+<div class="flex flex-col items-center flex-1 h-full justify-end group">
+<div class="w-full max-w-[40px] flex flex-col gap-0.5 h-[82%] opacity-90 hover:opacity-100 transition-opacity cursor-pointer">
+<div class="bg-red-400 w-full h-[55%] rounded-t-sm"></div>
+<div class="bg-indigo-400 w-full h-[25%]"></div>
+<div class="bg-buy/20 w-full h-[20%] rounded-b-sm border-t border-white/10"></div>
+</div>
+<span class="mt-2 text-[10px] text-zinc-500 font-mono">Y5</span>
+</div>
+<!-- Bar Group 3: Year 10 -->
+<div class="flex flex-col items-center flex-1 h-full justify-end group">
+<div class="w-full max-w-[40px] flex flex-col gap-0.5 h-[85%] opacity-90 hover:opacity-100 transition-opacity cursor-pointer">
+<div class="bg-red-400 w-full h-[45%] rounded-t-sm"></div>
+<div class="bg-indigo-400 w-full h-[25%]"></div>
+<div class="bg-buy/20 w-full h-[30%] rounded-b-sm border-t border-white/10"></div>
+</div>
+<span class="mt-2 text-[10px] text-zinc-500 font-mono">Y10</span>
+</div>
+<!-- Bar Group 4: Year 15 -->
+<div class="flex flex-col items-center flex-1 h-full justify-end group">
+<div class="w-full max-w-[40px] flex flex-col gap-0.5 h-[88%] opacity-90 hover:opacity-100 transition-opacity cursor-pointer">
+<div class="bg-red-400 w-full h-[35%] rounded-t-sm"></div>
+<div class="bg-indigo-400 w-full h-[25%]"></div>
+<div class="bg-buy/20 w-full h-[40%] rounded-b-sm border-t border-white/10"></div>
+</div>
+<span class="mt-2 text-[10px] text-zinc-500 font-mono">Y15</span>
+</div>
+<!-- Bar Group 5: Year 20 -->
+<div class="flex flex-col items-center flex-1 h-full justify-end group">
+<div class="w-full max-w-[40px] flex flex-col gap-0.5 h-[92%] opacity-90 hover:opacity-100 transition-opacity cursor-pointer">
+<div class="bg-red-400 w-full h-[25%] rounded-t-sm"></div>
+<div class="bg-indigo-400 w-full h-[25%]"></div>
+<div class="bg-buy/20 w-full h-[50%] rounded-b-sm border-t border-white/10"></div>
+</div>
+<span class="mt-2 text-[10px] text-zinc-500 font-mono">Y20</span>
+</div>
+<!-- Bar Group 6: Year 25 -->
+<div class="flex flex-col items-center flex-1 h-full justify-end group">
+<div class="w-full max-w-[40px] flex flex-col gap-0.5 h-[95%] opacity-90 hover:opacity-100 transition-opacity cursor-pointer">
+<div class="bg-red-400 w-full h-[15%] rounded-t-sm"></div>
+<div class="bg-indigo-400 w-full h-[25%]"></div>
+<div class="bg-buy/20 w-full h-[60%] rounded-b-sm border-t border-white/10"></div>
+</div>
+<span class="mt-2 text-[10px] text-zinc-500 font-mono">Y25</span>
+</div>
+<!-- Bar Group 7: Year 30 -->
+<div class="flex flex-col items-center flex-1 h-full justify-end group">
+<div class="w-full max-w-[40px] flex flex-col gap-0.5 h-[98%] opacity-90 hover:opacity-100 transition-opacity cursor-pointer">
+<div class="bg-red-400 w-full h-[5%] rounded-t-sm"></div>
+<div class="bg-indigo-400 w-full h-[25%]"></div>
+<div class="bg-buy/20 w-full h-[70%] rounded-b-sm border-t border-white/10"></div>
+</div>
+<span class="mt-2 text-[10px] text-zinc-500 font-mono">Y30</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Gradient Blurs for atmosphere -->
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none mix-blend-screen"></div>
+<div class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-buy/5 rounded-full blur-[80px] pointer-events-none mix-blend-screen"></div>
+</main>
+</body></html>
