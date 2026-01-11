@@ -28,6 +28,7 @@
     *   Create a Zustand store to hold user inputs (Home Price, Interest Rate, Rent, Inflation, etc.).
     *   Automatically re-run the `simulateTimeline` logic whenever inputs change.
 4.  **UI Components - Inputs:**
+    *   **Reference Design:** Consult `docs/ui/page_1.html` for the "Financial Cockpit" aesthetic and layout structure.
     *   Create reusable `NumberInput` and `Slider` components.
     *   Build the **Left Sidebar** containing the collapsible sections: "Property", "Rental", and "Market".
 
