@@ -40,7 +40,7 @@ export const SimulationInputGroup: React.FC<SimulationInputGroupProps> = ({
             onChange={onChange}
             prefix={prefix}
             suffix={suffix}
-            className="w-24" // Fixed width for consistency
+            className="w-28" // Fixed width for consistency
           />
         </div>
       </div>

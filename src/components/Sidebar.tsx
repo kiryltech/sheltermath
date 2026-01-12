@@ -80,19 +80,18 @@ export const Sidebar = () => {
       {/* Sidebar Container */}
       <aside
         className={cn(
-            "fixed inset-y-0 left-0 z-40 w-full md:relative md:w-[320px] flex-shrink-0 bg-zinc-900 border-r border-white/5 flex flex-col h-full shadow-xl overflow-hidden transition-transform duration-300 ease-in-out md:translate-x-0",
+            "fixed inset-y-0 left-0 z-40 w-full md:relative md:w-[320px] flex-shrink-0 bg-surface-dark border-r border-white/5 flex flex-col h-full shadow-xl overflow-hidden transition-transform duration-300 ease-in-out md:translate-x-0 font-display",
             isOpenMobile ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Header */}
-        <div className="px-6 py-5 border-b border-white/5 bg-zinc-900/50 backdrop-blur-sm sticky top-0 z-10 flex items-center justify-between">
+        <div className="px-6 py-5 border-b border-white/5 bg-surface-dark/50 backdrop-blur-sm sticky top-0 z-10 flex items-center justify-between">
           <div className="flex items-center gap-2">
-              <div className="text-primary font-bold text-xl">SM</div>
-               {/* Using text for logo for now as I don't have the icon svg ready other than lucide */}
-            <div>
-              <h1 className="text-sm font-bold tracking-tight text-white uppercase">Shelter Math</h1>
-              <p className="text-xs text-zinc-500 font-mono">v2.4.0_beta</p>
-            </div>
+              <span className="material-symbols-outlined text-primary text-[24px]">domain</span>
+              <div>
+                <h1 className="text-sm font-bold tracking-tight text-white uppercase">Shelter Math</h1>
+                <p className="text-xs text-zinc-500 font-mono">v2.4.0_beta</p>
+              </div>
           </div>
           {/* Mobile Close Button */}
           <button
