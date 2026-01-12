@@ -1,6 +1,7 @@
 import React from 'react';
 import { NumberInput } from './ui/NumberInput';
 import { Slider } from './ui/Slider';
+import { cn } from '@/lib/utils';
 
 interface SimulationInputGroupProps {
   label: string;
