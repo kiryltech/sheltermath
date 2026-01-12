@@ -5,6 +5,7 @@ import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X } from 
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { SimulationInputGroup } from './SimulationInputGroup';
 import { cn } from '@/lib/utils';
+import { APP_NAME, APP_VERSION } from '@/lib/config';
 
 // Helper to format currency for helper text
 const formatCurrency = (val: number) => {
@@ -89,8 +90,8 @@ export const Sidebar = () => {
           <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-[24px]">domain</span>
               <div>
-                <h1 className="text-sm font-bold tracking-tight text-white uppercase">Shelter Math</h1>
-                <p className="text-xs text-zinc-500 font-mono">v2.4.0_beta</p>
+                <h1 className="text-sm font-bold tracking-tight text-white uppercase">{APP_NAME}</h1>
+                <p className="text-xs text-zinc-500 font-mono">{APP_VERSION}</p>
               </div>
           </div>
           {/* Mobile Close Button */}
@@ -115,6 +116,7 @@ export const Sidebar = () => {
                 max={3000000}
                 step={10000}
                 prefix="$"
+                inputClassName="w-32"
             />
             <SimulationInputGroup
                 label="Down Payment"
@@ -125,6 +127,7 @@ export const Sidebar = () => {
                 step={1}
                 suffix="%"
                 helperText={formatCurrency(downPaymentAmount)}
+                inputClassName="w-20"
             />
              <SimulationInputGroup
                 label="Interest Rate"
@@ -134,9 +137,8 @@ export const Sidebar = () => {
                 max={15}
                 step={0.125}
                 suffix="%"
+                inputClassName="w-24"
             />
-             {/* Collapsed Advanced Property Settings? Or just list them?
-                 Let's add them but maybe user can scroll */}
             <SimulationInputGroup
                 label="Loan Term"
                 value={inputs.loanTermYears}
@@ -145,6 +147,7 @@ export const Sidebar = () => {
                 max={40}
                 step={5}
                 suffix="Yr"
+                inputClassName="w-20"
             />
         </SidebarSection>
 
@@ -160,6 +163,7 @@ export const Sidebar = () => {
                 max={15000}
                 step={50}
                 prefix="$"
+                inputClassName="w-28"
             />
             <SimulationInputGroup
                 label="Rent Inflation"
@@ -169,6 +173,7 @@ export const Sidebar = () => {
                 max={15}
                 step={0.1}
                 suffix="%"
+                inputClassName="w-20"
             />
              <SimulationInputGroup
                 label="Renters Ins."
@@ -178,6 +183,7 @@ export const Sidebar = () => {
                 max={200}
                 step={5}
                 prefix="$"
+                inputClassName="w-24"
             />
         </SidebarSection>
 
@@ -193,6 +199,7 @@ export const Sidebar = () => {
                 max={15}
                 step={0.1}
                 suffix="%"
+                inputClassName="w-20"
             />
             <SimulationInputGroup
                 label="Investment Return"
@@ -202,6 +209,7 @@ export const Sidebar = () => {
                 max={15}
                 step={0.1}
                 suffix="%"
+                inputClassName="w-20"
             />
             <SimulationInputGroup
                 label="Inflation Rate"
@@ -211,6 +219,7 @@ export const Sidebar = () => {
                 max={15}
                 step={0.1}
                 suffix="%"
+                inputClassName="w-20"
             />
              <SimulationInputGroup
                 label="Property Tax"
@@ -220,6 +229,7 @@ export const Sidebar = () => {
                 max={5}
                 step={0.1}
                 suffix="%"
+                inputClassName="w-20"
             />
              <SimulationInputGroup
                 label="Maintenance"
@@ -229,6 +239,7 @@ export const Sidebar = () => {
                 max={5}
                 step={0.1}
                 suffix="%"
+                inputClassName="w-20"
             />
         </SidebarSection>
 

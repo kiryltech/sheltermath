@@ -12,6 +12,7 @@ interface SimulationInputGroupProps {
   prefix?: string;
   suffix?: string;
   helperText?: string;
+  inputClassName?: string;
 }
 
 export const SimulationInputGroup: React.FC<SimulationInputGroupProps> = ({
@@ -24,6 +25,7 @@ export const SimulationInputGroup: React.FC<SimulationInputGroupProps> = ({
   prefix,
   suffix,
   helperText,
+  inputClassName,
 }) => {
   return (
     <div className="group">
@@ -40,7 +42,7 @@ export const SimulationInputGroup: React.FC<SimulationInputGroupProps> = ({
             onChange={onChange}
             prefix={prefix}
             suffix={suffix}
-            className="w-28" // Fixed width for consistency
+            className={cn("w-24", inputClassName)} // Default to w-24, allow override
           />
         </div>
       </div>
