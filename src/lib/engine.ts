@@ -119,29 +119,9 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
   const loanPrincipal = homePrice - downPayment;
   const monthlyMortgagePI = calculateMonthlyPayments(loanPrincipal, mortgageRate, loanTermYears);
 
-  // We need Home Insurance. Since it's not in the params list from the doc, I'll add a default or estimate.
-  // Standard estimate is often 0.35% of home value annually, but I'll add it to params to be safe later.
-  // For now, I'll assume it's 0 or included in maintenance if not provided?
-  // Actually, let's verify if I should update params. Design doc list:
-  // "Property Tax Rate (%)", "Maintenance Costs (% of value)".
-  // "Owner Cost: Mortgage (P&I) + Tax + Insurance + Maintenance".
-  // I will add `homeInsuranceRate` (annual %) to params.
-  // I'll update the interface above.
-
   // Monthly rates
   const monthlyAppreciationRate = homeAppreciationRate / 100 / 12;
   const monthlyInvestmentReturn = investmentReturnRate / 100 / 12;
-  // const monthlyRentInflation = rentInflationRate / 100 / 12; // Unused for now as we inflate annually
-  // Tax and Maint inflate? Design doc: "Tax/Ins/Maint inflate annually".
-  // Usually tax is based on assessed value which may increase. Maint increases with inflation or value.
-  // Let's assume Tax and Maint are % of CURRENT home value? Or initial?
-  // Usually Property Tax is % of Assessed Value. In CA (Prop 13), it's capped.
-  // But generally, let's assume it scales with Home Value for simplicity, or with Inflation?
-  // "Tax/Ins/Maint inflate annually".
-  // Let's assume they are recalculated based on the Home Value which appreciates?
-  // Or just inflate by "Inflation Rate"?
-  // Design doc: "Tax/Ins/Maint inflate annually".
-  // I will implement them as % of current home value. This inherently inflates them as home value appreciates.
 
   let currentHomeValue = homePrice;
   let currentRent = monthlyRent;
