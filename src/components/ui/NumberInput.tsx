@@ -70,7 +70,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
             onChange={handleChange}
             onBlur={handleBlur}
             className={cn(
-                "bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all",
+                "w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all",
                 prefix && "pl-5",
                 suffix && "pr-6" // Add padding for suffix
             )}
