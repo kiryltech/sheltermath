@@ -104,7 +104,7 @@ export const Sidebar = () => {
         </div>
 
         {/* Scrollable Inputs Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 custom-scrollbar">
 
         {/* Section: Property */}
         <SidebarSection title="Property Basics" icon={Home}>
