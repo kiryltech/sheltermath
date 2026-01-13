@@ -1,6 +1,8 @@
 import React from 'react';
+import { CircleHelp } from 'lucide-react';
 import { NumberInput } from './ui/NumberInput';
 import { Slider } from './ui/Slider';
+import { Tooltip } from './ui/Tooltip';
 import { cn } from '@/lib/utils';
 
 interface SimulationInputGroupProps {
@@ -14,6 +16,7 @@ interface SimulationInputGroupProps {
   suffix?: string;
   helperText?: string;
   inputClassName?: string;
+  tooltip?: string;
 }
 
 export const SimulationInputGroup: React.FC<SimulationInputGroupProps> = ({
@@ -27,11 +30,19 @@ export const SimulationInputGroup: React.FC<SimulationInputGroupProps> = ({
   suffix,
   helperText,
   inputClassName,
+  tooltip,
 }) => {
   return (
     <div className="group">
       <div className="flex justify-between items-center mb-2">
-        <div className="text-sm font-medium text-zinc-300 flex items-center gap-2">{label}</div>
+        <div className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+          {label}
+          {tooltip && (
+            <Tooltip content={tooltip}>
+              <CircleHelp className="w-3.5 h-3.5 text-zinc-500 hover:text-zinc-300 transition-colors cursor-help" />
+            </Tooltip>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           {helperText && (
             <span className="text-xs text-zinc-500 font-mono tabular-nums">
