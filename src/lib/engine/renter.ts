@@ -1,11 +1,5 @@
-import { SimulationParams } from './types';
+import { SimulationParams, RenterMonthlyState } from './types';
 import { calculateMonthlyGeometricRate } from './utils';
-
-export interface RenterMonthlyState {
-    rentPayment: number;
-    rentersInsurance: number;
-    totalOutflow: number;
-}
 
 export function calculateRenterSchedule(params: SimulationParams): RenterMonthlyState[] {
     const {

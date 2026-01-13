@@ -1,20 +1,5 @@
-import { SimulationParams } from './types';
+import { SimulationParams, OwnerMonthlyState } from './types';
 import { calculateMonthlyGeometricRate } from './utils';
-
-export interface OwnerMonthlyState {
-    mortgagePayment: number;
-    propertyTax: number;
-    homeInsurance: number;
-    maintenanceCost: number;
-    pmiPayment: number;
-    totalOutflow: number;
-    interestPayment: number;
-    principalPayment: number;
-    remainingPrincipal: number;
-    homeValue: number;
-    realizableEquity: number;
-    monthlyAppreciation: number;
-}
 
 export function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: number, loanPrincipal: number): OwnerMonthlyState[] {
     const {

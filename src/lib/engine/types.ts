@@ -37,6 +37,27 @@ export interface SimulationParams {
   ownerDiscipline: number; // Percentage (0-100) of excess cash invested
 }
 
+export interface OwnerMonthlyState {
+    mortgagePayment: number;
+    propertyTax: number;
+    homeInsurance: number;
+    maintenanceCost: number;
+    pmiPayment: number;
+    totalOutflow: number;
+    interestPayment: number;
+    principalPayment: number;
+    remainingPrincipal: number;
+    homeValue: number;
+    realizableEquity: number;
+    monthlyAppreciation: number;
+}
+
+export interface RenterMonthlyState {
+    rentPayment: number;
+    rentersInsurance: number;
+    totalOutflow: number;
+}
+
 export interface AnnualFlows {
   year: number;
   // Renter
