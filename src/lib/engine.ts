@@ -237,6 +237,9 @@ function calculateRenterSchedule(params: SimulationParams): RenterMonthlyState[]
         simulationYears
     } = params;
 
+    // Use Geometric compounding for Rent Inflation
+    const monthlyRentInflation = calculateMonthlyGeometricRate(rentInflationRate);
+
     let currentRent = monthlyRent;
     let currentRentersInsurance = rentersInsuranceMonthly;
     const schedule: RenterMonthlyState[] = [];
@@ -250,11 +253,9 @@ function calculateRenterSchedule(params: SimulationParams): RenterMonthlyState[]
             totalOutflow
         });
 
-        // Annual inflation
-        if (month % 12 === 0) {
-            currentRent *= (1 + rentInflationRate / 100);
-            currentRentersInsurance *= (1 + rentInflationRate / 100);
-        }
+        // Monthly inflation
+        currentRent *= (1 + monthlyRentInflation);
+        currentRentersInsurance *= (1 + monthlyRentInflation);
     }
     return schedule;
 }
