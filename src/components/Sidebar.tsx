@@ -201,6 +201,7 @@ export const Sidebar = () => {
             />
             <SimulationInputGroup
                 label="Itemized Deduction"
+                tooltip="Percentage of mortgage interest and property tax you claim as a deduction (vs Standard Deduction)."
                 value={inputs.itemizedDeductionRate ?? 0}
                 onChange={update('itemizedDeductionRate')}
                 min={0}

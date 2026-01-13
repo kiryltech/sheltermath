@@ -1,49 +1,106 @@
 # Simulation Parameters
 
-This document details the input parameters available in the Rent vs. Buy calculator. These parameters drive the financial simulation engine, allowing you to model various economic scenarios and personal financial situations.
+This guide explains the inputs for the Rent vs. Buy calculator. Use these settings to model your specific financial scenario.
 
-## Household Income
+## 💰 Household Income
+*Defines your earning power and tax situation.*
 
-These parameters define your earning capacity and tax obligations, which determine your net income and affordability.
+*   **Gross Income**
+    Total annual household income before taxes. Used to calculate monthly net income and affordability ratios.
 
-*   **Gross Income**: Your total annual household income before taxes. This is the starting point for calculating your take-home pay and debt-to-income ratios.
-*   **Federal Tax**: Your effective federal income tax rate. This is the percentage of your gross income that goes to the federal government. Note that this should be your *effective* rate (total tax / total income), not your marginal bracket.
-*   **State Tax**: Your effective state income tax rate. Similar to the federal tax, this is the percentage of your gross income paid to the state.
-*   **Income Growth**: The expected annual percentage increase in your household income. By default, this matches the inflation rate, assuming your purchasing power stays constant. Increasing this simulates career progression or raises above inflation.
+*   **Federal Tax Rate**
+    Your *effective* federal income tax rate (Total Tax ÷ Total Income). This is usually lower than your [marginal tax bracket](https://www.investopedia.com/ask/answers/05/marginaltaxrate.asp).
 
-## Property Basics
+*   **State Tax Rate**
+    Your *effective* state income tax rate.
 
-These inputs define the costs associated with purchasing and financing a home.
+*   **Income Growth**
+    Annual % increase in salary.
+    *   *Default:* Matches inflation (purchasing power stays flat).
+    *   *Tip:* Increase this if you expect significant career advancement.
 
-*   **Home Price**: The target purchase price of the property.
-*   **Down Payment**: The percentage of the home price you intend to pay upfront in cash. The remaining amount will be financed via a mortgage.
-*   **PMI Rate**: The annual rate for Private Mortgage Insurance. This is typically required if your down payment is less than 20%. It is calculated as a percentage of the original loan amount.
-*   **Interest Rate**: The annual fixed interest rate on your mortgage. This determines your monthly principal and interest payments.
-*   **Loan Term**: The duration of your mortgage in years (typically 15 or 30 years).
+*   **Itemized Deduction**
+    Percentage of housing costs (Mortgage Interest + Property Tax) you claim on taxes.
+    *   **0%**: You take the Standard Deduction (Housing has no tax benefit).
+    *   **100%**: You Itemize (Full tax benefit).
+    *   *Note:* The calculator respects the [\$10k SALT cap](https://www.investopedia.com/terms/s/salt-tax-deduction.asp) automatically.
 
-## Savings Discipline
+---
 
-These parameters control behavioral assumptions about how surplus cash is handled.
+## 🏠 Property Basics
+*The cost of the home you want to buy.*
 
-*   **Renter Discipline**: The percentage of "renter savings" that is actually invested. "Renter savings" is the difference between the monthly cost of buying (mortgage, tax, maintenance, etc.) and renting. If renting is cheaper, this parameter dictates how much of that difference gets invested into the stock market. 0% means you spend the difference; 100% means you diligently invest every penny.
-*   **Owner Discipline**: The percentage of "owner savings" that is invested. If buying becomes cheaper than renting (usually in later years as rent rises while mortgage payments stay fixed), this dictates how much of that cash flow surplus the owner invests.
+*   **Home Price**
+    The purchase price of the property.
 
-## Rental Market
+*   **Down Payment**
+    Percentage of the price paid upfront in cash.
+    *   *Tip:* Values < 20% typically trigger PMI.
 
-These parameters forecast the cost of renting a comparable property.
+*   **Interest Rate**
+    Annual fixed interest rate for the mortgage.
 
-*   **Monthly Rent**: The current monthly rent for a property similar to the one you are considering buying.
-*   **Rent Inflation**: The expected annual percentage increase in rent. Rent typically increases with inflation or slightly higher in hot markets.
-*   **Renters Insurance**: The monthly cost of renter's insurance to protect your personal property.
+*   **Loan Term**
+    Length of the mortgage (e.g., 30 Years).
 
-## Forecasts
+*   **PMI Rate**
+    Annual cost of [Private Mortgage Insurance](https://www.investopedia.com/terms/p/insurance.asp) (if Down Payment < 20%). Calculated on the loan amount.
 
-These economic assumptions project future values over the simulation period.
+---
 
-*   **Home Appreciation**: The expected annual percentage increase in the home's value. This is a key driver of the owner's return on investment.
-*   **Investment Return**: The expected annual nominal rate of return on your investment portfolio (e.g., stocks, bonds). This applies to the down payment (for the renter) and any monthly savings invested by either party.
-*   **Inflation Rate**: The general annual inflation rate. This is used to adjust future values to "today's dollars" if the "Inflation Adjusted" toggle is enabled.
-*   **Inflation Adjusted (Toggle)**: If enabled, all financial outputs (Net Worth, Cash Flow) are discounted back to Present Value terms using the Inflation Rate. This helps you understand the "real" purchasing power of future money.
-*   **Property Tax**: The annual property tax rate, expressed as a percentage of the home's assessed value.
-*   **CA Prop 13 (Toggle)**: If enabled, this simulates California's Proposition 13 tax rules. The assessed value for tax purposes is limited to a maximum 2% annual increase, regardless of the actual market appreciation of the home. This can significantly reduce tax burdens for long-term owners in high-appreciation areas.
-*   **Maintenance**: The annual cost of home maintenance and repairs, expressed as a percentage of the home's value. Experts often recommend budgeting 1-2% annually.
+## 🧠 Savings Discipline
+*Behavioral assumptions: "Do you actually invest the money you save?"*
+
+This is the **most critical** variable in the Rent vs. Buy debate.
+
+*   **Renter Discipline**
+    If renting is cheaper than buying, what % of the monthly savings do you invest?
+    *   **0%**: You spend the extra cash on lifestyle (Buying usually wins long-term).
+    *   **100%**: You invest every penny of the savings (Renting often wins).
+
+*   **Owner Discipline**
+    In later years, buying often becomes cheaper than renting (as rents rise). What % of *that* savings does the owner invest?
+
+---
+
+## 🏢 Rental Market
+*The alternative scenario.*
+
+*   **Monthly Rent**
+    Current rent for a home comparable to the one you might buy.
+
+*   **Rent Inflation**
+    Annual % increase in rent.
+    *   *Tip:* Historical average is often near inflation (3-4%), but hot markets can be much higher.
+
+*   **Renters Insurance**
+    Monthly cost to insure your personal property while renting.
+
+---
+
+## 🔮 Forecasts
+*Economic predictions for the future.*
+
+*   **Home Appreciation**
+    Annual % growth in the home's value.
+
+*   **Investment Return**
+    Annual return on your stock/bond portfolio (e.g., [S&P 500 historical avg](https://www.investopedia.com/ask/answers/042415/what-average-annual-return-sp-500.asp) is ~10%, or ~7% adjusted for inflation).
+
+*   **Inflation Rate**
+    General loss of purchasing power over time.
+
+*   **Inflation Adjusted (Toggle)**
+    *   **On**: All dollar amounts (Net Worth, Cash Flow) are shown in "Today's Dollars".
+    *   **Off**: Amounts are shown in future (nominal) dollars.
+
+*   **Property Tax**
+    Annual tax as a % of the home's assessed value.
+
+*   **CA Prop 13 (Toggle)**
+    *   **On**: Limits assessed value growth to 2% per year ([California Proposition 13](https://en.wikipedia.org/wiki/1978_California_Proposition_13)).
+    *   **Off**: Assessed value grows with Home Appreciation.
+
+*   **Maintenance**
+    Annual cost for repairs/upkeep as a % of home value.
+    *   *Rule of Thumb:* 1.0% per year.
