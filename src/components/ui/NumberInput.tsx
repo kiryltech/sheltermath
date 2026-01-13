@@ -1,5 +1,5 @@
-import React, { ChangeEvent } from 'react';
-import { cn } from '@/lib/utils'; // Assuming cn exists, I'll check this next
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 interface NumberInputProps {
   value: number;
@@ -16,10 +16,6 @@ interface NumberInputProps {
 export const NumberInput: React.FC<NumberInputProps> = ({
   value,
   onChange,
-  min,
-  max,
-  step,
-  label,
   prefix,
   suffix,
   className,
@@ -28,11 +24,11 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   const formatNumber = (num: number) => num.toLocaleString('en-US', { maximumFractionDigits: 10 });
   const parseNumber = (str: string) => parseFloat(str.replace(/,/g, ''));
 
-  const [localValue, setLocalValue] = React.useState<string>(formatNumber(value));
-  const [isFocused, setIsFocused] = React.useState(false);
+  const [localValue, setLocalValue] = useState<string>(formatNumber(value));
+  const [isFocused, setIsFocused] = useState(false);
 
   // Sync local value when prop changes externally, but only if not focused (to avoid fighting user input)
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isFocused) {
         setLocalValue(formatNumber(value));
     }
@@ -49,25 +45,12 @@ export const NumberInput: React.FC<NumberInputProps> = ({
         const numValue = parseNumber(rawValue);
         if (!isNaN(numValue)) {
             onChange(numValue);
-        } else if (rawValue === '') {
-             // Optional: Handle empty input
         }
     }
   };
 
   const handleFocus = () => {
       setIsFocused(true);
-      // On focus, strip commas for easier editing?
-      // Actually, standard behavior is often to keep them or strip them.
-      // Let's keep them for now, but ensure parsing handles them.
-      // If we want to strip on focus:
-      // setLocalValue(localValue.replace(/,/g, ''));
-      // But user asked for comma as separator, implying display.
-      // Let's keep commas in display always if possible, or re-add them as user types?
-      // Simple approach: Format on blur. Strip on focus?
-      // Let's strip on focus to make editing easier (standard for some number inputs),
-      // OR keep them and handle cursor... handling cursor with commas is hard.
-      // Easiest robust UX: Strip commas on focus (raw number), format on blur.
       setLocalValue(value.toString());
   };
 

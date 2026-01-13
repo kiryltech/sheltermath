@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { SimulationInputGroup } from './SimulationInputGroup';
 import { cn } from '@/lib/utils';
@@ -12,36 +12,6 @@ const formatCurrency = (val: number) => {
     if (val >= 1000000) return `$${(val / 1000000).toFixed(1)}M`;
     if (val >= 1000) return `$${(val / 1000).toFixed(0)}k`;
     return `$${val}`;
-};
-
-interface SectionProps {
-    title: string;
-    icon: React.ElementType;
-    children: React.ReactNode;
-    defaultOpen?: boolean;
-}
-
-const SidebarSection: React.FC<SectionProps> = ({ title, icon: Icon, children, defaultOpen = true }) => {
-    const [isOpen, setIsOpen] = useState(defaultOpen);
-
-    return (
-        <div className="space-y-4">
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 w-full text-left hover:text-zinc-300 transition-colors"
-            >
-                <Icon className="text-zinc-500 w-4 h-4" />
-                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-500 flex-1">{title}</h2>
-                {isOpen ? <ChevronDown className="w-3 h-3 text-zinc-500" /> : <ChevronRight className="w-3 h-3 text-zinc-500" />}
-            </button>
-
-            {isOpen && (
-                <div className="space-y-5 pl-1">
-                    {children}
-                </div>
-            )}
-        </div>
-    );
 };
 
 export const Sidebar = () => {
@@ -106,8 +76,13 @@ export const Sidebar = () => {
         {/* Scrollable Inputs Area */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 custom-scrollbar">
 
-        {/* Section: Property */}
-        <SidebarSection title="Property Basics" icon={Home}>
+        {/* Section: Property Basics */}
+        <div className="space-y-5">
+            <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined text-zinc-500 text-[18px]">home</span>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-500">Property Basics</h2>
+            </div>
+
             <SimulationInputGroup
                 label="Home Price"
                 value={inputs.homePrice}
@@ -116,7 +91,7 @@ export const Sidebar = () => {
                 max={3000000}
                 step={10000}
                 prefix="$"
-                inputClassName="w-32"
+                inputClassName="w-28"
             />
             <SimulationInputGroup
                 label="Down Payment"
@@ -137,8 +112,9 @@ export const Sidebar = () => {
                 max={15}
                 step={0.125}
                 suffix="%"
-                inputClassName="w-24"
+                inputClassName="w-20"
             />
+            {/* Keeping Loan Term but not shown in design explicitly, grouping here makes sense */}
             <SimulationInputGroup
                 label="Loan Term"
                 value={inputs.loanTermYears}
@@ -149,38 +125,16 @@ export const Sidebar = () => {
                 suffix="Yr"
                 inputClassName="w-20"
             />
-        </SidebarSection>
-
-        <hr className="border-white/5" />
-
-        {/* Section: Savings Discipline */}
-        <SidebarSection title="Savings Discipline" icon={TrendingUp}>
-             <SimulationInputGroup
-                label="Renter Discipline"
-                value={inputs.renterDiscipline}
-                onChange={update('renterDiscipline')}
-                min={0}
-                max={100}
-                step={5}
-                suffix="%"
-                inputClassName="w-20"
-            />
-             <SimulationInputGroup
-                label="Owner Discipline"
-                value={inputs.ownerDiscipline}
-                onChange={update('ownerDiscipline')}
-                min={0}
-                max={100}
-                step={5}
-                suffix="%"
-                inputClassName="w-20"
-            />
-        </SidebarSection>
+        </div>
 
         <hr className="border-white/5" />
 
         {/* Section: Rental Market */}
-        <SidebarSection title="Rental Market" icon={Building2}>
+        <div className="space-y-5">
+            <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined text-zinc-500 text-[18px]">apartment</span>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-500">Rental Market</h2>
+            </div>
             <SimulationInputGroup
                 label="Monthly Rent"
                 value={inputs.monthlyRent}
@@ -189,7 +143,7 @@ export const Sidebar = () => {
                 max={15000}
                 step={50}
                 prefix="$"
-                inputClassName="w-28"
+                inputClassName="w-24"
             />
             <SimulationInputGroup
                 label="Rent Inflation"
@@ -201,6 +155,7 @@ export const Sidebar = () => {
                 suffix="%"
                 inputClassName="w-20"
             />
+             {/* Not in design but necessary */}
              <SimulationInputGroup
                 label="Renters Ins."
                 value={inputs.rentersInsuranceMonthly}
@@ -209,14 +164,18 @@ export const Sidebar = () => {
                 max={200}
                 step={5}
                 prefix="$"
-                inputClassName="w-24"
+                inputClassName="w-20"
             />
-        </SidebarSection>
+        </div>
 
         <hr className="border-white/5" />
 
         {/* Section: Forecasts */}
-        <SidebarSection title="Forecasts" icon={TrendingUp}>
+        <div className="space-y-5 pb-10">
+            <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined text-zinc-500 text-[18px]">trending_up</span>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-500">Forecasts</h2>
+            </div>
             <SimulationInputGroup
                 label="Home Appreciation"
                 value={inputs.homeAppreciationRate}
@@ -237,6 +196,10 @@ export const Sidebar = () => {
                 suffix="%"
                 inputClassName="w-20"
             />
+
+            {/* The rest of the inputs - maybe grouped or just listed under forecasts? */}
+            {/* Design only shows the first two. I will keep the others here as they fit "Forecasts" roughly or create a generic "Assumptions" section. */}
+
             <SimulationInputGroup
                 label="Inflation Rate"
                 value={inputs.inflationRate}
@@ -267,7 +230,42 @@ export const Sidebar = () => {
                 suffix="%"
                 inputClassName="w-20"
             />
-        </SidebarSection>
+
+             {/* Savings Discipline - putting it here or at the end. Design doesn't emphasize it. */}
+             {/* I will add a small divider and title if I want to keep it distinct, or just lump it in Forecasts/Assumptions. */}
+             {/* Let's keep it under Forecasts but maybe with a subtle separator or just in the list. */}
+             {/* Actually, let's create a "Discipline" section since it's user behavior, not market forecast. */}
+        </div>
+
+         <hr className="border-white/5" />
+
+        {/* Section: Discipline (Extra) */}
+        <div className="space-y-5 pb-10">
+             <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined text-zinc-500 text-[18px]">savings</span>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-500">Discipline</h2>
+            </div>
+             <SimulationInputGroup
+                label="Renter Invest %"
+                value={inputs.renterDiscipline}
+                onChange={update('renterDiscipline')}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                inputClassName="w-20"
+            />
+             <SimulationInputGroup
+                label="Owner Invest %"
+                value={inputs.ownerDiscipline}
+                onChange={update('ownerDiscipline')}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                inputClassName="w-20"
+            />
+        </div>
 
       </div>
     </aside>
