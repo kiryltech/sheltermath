@@ -23,8 +23,9 @@ export const DEFAULT_INPUTS: SimulationParams = {
   investmentReturnRate: 10.0,
   inflationRate: 3.0,
   simulationYears: 35,
-  renterDiscipline: 50, // Default 50%
-  ownerDiscipline: 25, // Default 25%
+  // No investment, inflate the lifestyle instead.
+  renterDiscipline: 0,
+  ownerDiscipline: 0,
   pmiRate: 0.5, // Default PMI rate 0.5%
 };
 
