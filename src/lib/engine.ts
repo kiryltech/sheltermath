@@ -24,6 +24,7 @@ export interface SimulationParams {
 
   // Simulation
   simulationYears: number;
+  inflationAdjusted?: boolean;
 
   // Discipline
   renterDiscipline: number; // Percentage (0-100) of excess cash invested
@@ -271,7 +272,9 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
     investmentReturnRate,
     simulationYears,
     renterDiscipline = 100, // Default to 100 if undefined (though interface requires it)
-    ownerDiscipline = 100
+    ownerDiscipline = 100,
+    inflationAdjusted = false,
+    inflationRate
   } = params;
 
   // Initial calculations
@@ -281,6 +284,9 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
 
   // Use Geometric compounding for Investment Return (Effective Annual Rate)
   const monthlyInvestmentReturn = calculateMonthlyGeometricRate(investmentReturnRate);
+
+  // Calculate discount rate if inflation adjustment is enabled
+  const monthlyDiscountRate = inflationAdjusted ? calculateMonthlyGeometricRate(inflationRate) : 0;
 
   // Generate Schedules
   const ownerSchedule = calculateOwnerSchedule(params, monthlyMortgagePI, loanPrincipal);
@@ -323,6 +329,12 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       const owner = ownerSchedule[i];
       const renter = renterSchedule[i];
 
+      // Discount Factor
+      // If inflationAdjusted is true, we discount back to time 0.
+      // We use the month number to discount.
+      // discountFactor = 1 / (1 + monthlyDiscountRate)^month
+      const discountFactor = inflationAdjusted ? (1 / Math.pow(1 + monthlyDiscountRate, month)) : 1;
+
       // Reset annual flows if new year
       if (year > currentYearFlows.year) {
           annualFlows.push({ ...currentYearFlows });
@@ -344,7 +356,8 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
           };
       }
 
-      totalInterestPaid += owner.interestPayment;
+      // We discount the interest paid when summing up the total
+      totalInterestPaid += owner.interestPayment * discountFactor;
 
       // Difference
       const diff = owner.totalOutflow - renter.totalOutflow;
@@ -381,40 +394,40 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       const ownerNetWorth = owner.realizableEquity + ownerInvestmentPortfolio;
       const renterNetWorth = renterInvestmentPortfolio;
 
-      // Accumulate Annual Flows
-      currentYearFlows.renterRent += renter.rentPayment;
-      currentYearFlows.renterInsurance += renter.rentersInsurance;
-      currentYearFlows.renterPortfolioContribution += renterContribution;
-      currentYearFlows.renterPortfolioGrowth += renterPortfolioGrowth;
+      // Accumulate Annual Flows (Apply Discount Factor)
+      currentYearFlows.renterRent += renter.rentPayment * discountFactor;
+      currentYearFlows.renterInsurance += renter.rentersInsurance * discountFactor;
+      currentYearFlows.renterPortfolioContribution += renterContribution * discountFactor;
+      currentYearFlows.renterPortfolioGrowth += renterPortfolioGrowth * discountFactor;
 
-      currentYearFlows.ownerPrincipalPaid += owner.principalPayment;
-      currentYearFlows.ownerInterestPaid += owner.interestPayment;
-      currentYearFlows.ownerTax += owner.propertyTax;
-      currentYearFlows.ownerInsurance += owner.homeInsurance;
-      currentYearFlows.ownerMaintenance += owner.maintenanceCost;
-      currentYearFlows.ownerPMI += owner.pmiPayment;
-      currentYearFlows.ownerHomeAppreciation += owner.monthlyAppreciation;
-      currentYearFlows.ownerPortfolioContribution += ownerContribution;
-      currentYearFlows.ownerPortfolioGrowth += ownerPortfolioGrowth;
+      currentYearFlows.ownerPrincipalPaid += owner.principalPayment * discountFactor;
+      currentYearFlows.ownerInterestPaid += owner.interestPayment * discountFactor;
+      currentYearFlows.ownerTax += owner.propertyTax * discountFactor;
+      currentYearFlows.ownerInsurance += owner.homeInsurance * discountFactor;
+      currentYearFlows.ownerMaintenance += owner.maintenanceCost * discountFactor;
+      currentYearFlows.ownerPMI += owner.pmiPayment * discountFactor;
+      currentYearFlows.ownerHomeAppreciation += owner.monthlyAppreciation * discountFactor;
+      currentYearFlows.ownerPortfolioContribution += ownerContribution * discountFactor;
+      currentYearFlows.ownerPortfolioGrowth += ownerPortfolioGrowth * discountFactor;
 
-      // Record Data
+      // Record Data (Apply Discount Factor)
       monthlyData.push({
           month,
           year,
-          mortgagePayment: owner.mortgagePayment,
-          propertyTax: owner.propertyTax,
-          homeInsurance: owner.homeInsurance,
-          maintenanceCost: owner.maintenanceCost,
-          pmiPayment: owner.pmiPayment,
-          totalOwnerCosts: owner.propertyTax + owner.homeInsurance + owner.maintenanceCost + owner.interestPayment + owner.pmiPayment, // Rough unrecoverable costs
-          totalOwnerOutflow: owner.totalOutflow,
-          rentPayment: renter.rentPayment,
-          rentersInsurance: renter.rentersInsurance,
-          totalRenterOutflow: renter.totalOutflow,
-          savings: Math.abs(diff),
-          investedAmount, // This is the amount actually invested (after discipline)
-          ownerNetWorth,
-          renterNetWorth
+          mortgagePayment: owner.mortgagePayment * discountFactor,
+          propertyTax: owner.propertyTax * discountFactor,
+          homeInsurance: owner.homeInsurance * discountFactor,
+          maintenanceCost: owner.maintenanceCost * discountFactor,
+          pmiPayment: owner.pmiPayment * discountFactor,
+          totalOwnerCosts: (owner.propertyTax + owner.homeInsurance + owner.maintenanceCost + owner.interestPayment + owner.pmiPayment) * discountFactor,
+          totalOwnerOutflow: owner.totalOutflow * discountFactor,
+          rentPayment: renter.rentPayment * discountFactor,
+          rentersInsurance: renter.rentersInsurance * discountFactor,
+          totalRenterOutflow: renter.totalOutflow * discountFactor,
+          savings: Math.abs(diff) * discountFactor,
+          investedAmount: investedAmount * discountFactor,
+          ownerNetWorth: ownerNetWorth * discountFactor,
+          renterNetWorth: renterNetWorth * discountFactor
       });
 
       if (!crossoverDate && ownerNetWorth > renterNetWorth) {
