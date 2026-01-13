@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
+import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X, DollarSign } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { SimulationInputGroup } from './SimulationInputGroup';
 import { Checkbox } from './ui/Checkbox';
@@ -144,6 +144,52 @@ export const Sidebar = () => {
 
         {/* Scrollable Inputs Area */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 custom-scrollbar">
+
+        {/* Section: Household Income */}
+        <SidebarSection title="Household Income" icon={DollarSign}>
+            <SimulationInputGroup
+                label="Gross Income"
+                value={inputs.grossIncome}
+                onChange={update('grossIncome')}
+                min={30000}
+                max={5000000}
+                step={5000}
+                prefix="$"
+                inputClassName="w-32"
+            />
+            <SimulationInputGroup
+                label="Federal Tax"
+                value={inputs.federalTaxRate}
+                onChange={update('federalTaxRate')}
+                min={0}
+                max={50}
+                step={0.5}
+                suffix="%"
+                inputClassName="w-20"
+            />
+            <SimulationInputGroup
+                label="State Tax"
+                value={inputs.stateTaxRate}
+                onChange={update('stateTaxRate')}
+                min={0}
+                max={20}
+                step={0.1}
+                suffix="%"
+                inputClassName="w-20"
+            />
+             <SimulationInputGroup
+                label="Income Growth"
+                value={inputs.incomeGrowthRate ?? inputs.inflationRate}
+                onChange={update('incomeGrowthRate')}
+                min={0}
+                max={15}
+                step={0.1}
+                suffix="%"
+                inputClassName="w-20"
+            />
+        </SidebarSection>
+
+        <hr className="border-white/5" />
 
         {/* Section: Property */}
         <SidebarSection title="Property Basics" icon={Home}>
