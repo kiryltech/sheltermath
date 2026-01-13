@@ -25,6 +25,7 @@ export const DEFAULT_INPUTS: SimulationParams = {
   simulationYears: 45, // Updated default to 45
   renterDiscipline: 50, // Default 50%
   ownerDiscipline: 25, // Default 25%
+  pmiRate: 0.5, // Default PMI rate 0.5%
 };
 
 export const useSimulationStore = create<SimulationState>((set) => ({

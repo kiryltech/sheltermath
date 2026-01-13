@@ -129,6 +129,18 @@ export const Sidebar = () => {
                 helperText={formatCurrency(downPaymentAmount)}
                 inputClassName="w-20"
             />
+            {inputs.downPaymentPercentage < 20 && (
+                <SimulationInputGroup
+                    label="PMI Rate"
+                    value={inputs.pmiRate ?? 0.5}
+                    onChange={update('pmiRate')}
+                    min={0}
+                    max={2.5}
+                    step={0.1}
+                    suffix="%"
+                    inputClassName="w-20"
+                />
+            )}
              <SimulationInputGroup
                 label="Interest Rate"
                 value={inputs.mortgageRate}
