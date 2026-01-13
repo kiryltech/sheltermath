@@ -86,8 +86,8 @@ export interface SimulationResult {
   monthlyData: MonthlyCashFlow[];
   annualData: AnnualSnapshot[];
   annualFlows: AnnualFlows[];
-  crossoverDate: { year: number; month: number } | null;
-  monthlyPaymentCrossoverDate: { year: number; month: number } | null;
+  crossoverDate: { year: number; totalMonths: number } | null;
+  monthlyPaymentCrossoverDate: { year: number; totalMonths: number } | null;
   summary: {
     totalInterestPaid: number;
     finalOwnerNetWorth: number;
@@ -294,8 +294,8 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
   const monthlyData: MonthlyCashFlow[] = [];
   const annualData: AnnualSnapshot[] = [];
   const annualFlows: AnnualFlows[] = [];
-  let crossoverDate: { year: number; month: number } | null = null;
-  let monthlyPaymentCrossoverDate: { year: number; month: number } | null = null;
+  let crossoverDate: { year: number; totalMonths: number } | null = null;
+  let monthlyPaymentCrossoverDate: { year: number; totalMonths: number } | null = null;
   let totalInterestPaid = 0;
 
   // Track aggregations for the current year
@@ -418,11 +418,11 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       });
 
       if (!crossoverDate && ownerNetWorth > renterNetWorth) {
-          crossoverDate = { year, month };
+          crossoverDate = { year, totalMonths: month };
       }
 
       if (!monthlyPaymentCrossoverDate && owner.totalOutflow <= renter.totalOutflow) {
-          monthlyPaymentCrossoverDate = { year, month };
+          monthlyPaymentCrossoverDate = { year, totalMonths: month };
       }
   }
 

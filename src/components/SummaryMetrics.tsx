@@ -11,8 +11,16 @@ export const SummaryMetrics = () => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
   };
 
-  const getMonthInYear = (totalMonth: number) => {
-    return (totalMonth - 1) % 12 + 1;
+  const formatDuration = (totalMonths: number) => {
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+
+    const parts = [];
+    if (years > 0) parts.push(`${years} year${years === 1 ? '' : 's'}`);
+    if (months > 0) parts.push(`${months} month${months === 1 ? '' : 's'}`);
+
+    if (parts.length === 0) return "Immediate";
+    return parts.join(', ');
   };
 
   const netWorthDiff = summary.finalOwnerNetWorth - summary.finalRenterNetWorth;
@@ -24,7 +32,7 @@ export const SummaryMetrics = () => {
       <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800">
         <h4 className="text-zinc-400 text-sm font-medium mb-1">Equity Crossover</h4>
         <div className="text-2xl font-bold text-white">
-          {crossoverDate ? `Year ${crossoverDate.year}, Month ${getMonthInYear(crossoverDate.month)}` : "Never"}
+          {crossoverDate ? formatDuration(crossoverDate.totalMonths) : "Never"}
         </div>
         <p className="text-xs text-zinc-500 mt-2">
             When buying becomes wealthier than renting
@@ -34,7 +42,7 @@ export const SummaryMetrics = () => {
       <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800">
         <h4 className="text-zinc-400 text-sm font-medium mb-1">Monthly Payment Crossover</h4>
         <div className="text-2xl font-bold text-white">
-          {monthlyPaymentCrossoverDate ? `Year ${monthlyPaymentCrossoverDate.year}, Month ${getMonthInYear(monthlyPaymentCrossoverDate.month)}` : "Never"}
+          {monthlyPaymentCrossoverDate ? formatDuration(monthlyPaymentCrossoverDate.totalMonths) : "Never"}
         </div>
         <p className="text-xs text-zinc-500 mt-2">
             When monthly ownership costs become less than renting
