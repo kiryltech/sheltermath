@@ -14,6 +14,44 @@ const formatCurrency = (val: number) => {
     return `$${val}`;
 };
 
+const ExpandableSection = ({ isOpen, children }: { isOpen: boolean, children: React.ReactNode }) => {
+    const [render, setRender] = useState(isOpen);
+    const [visible, setVisible] = useState(isOpen);
+
+    useEffect(() => {
+        if (isOpen) {
+            setRender(true);
+            // Double raf to ensure browser paints initial state before transitioning
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setVisible(true);
+                });
+            });
+        } else {
+            setVisible(false);
+            const timer = setTimeout(() => {
+                setRender(false);
+            }, 300); // matches duration-300
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen]);
+
+    if (!render) return null;
+
+    return (
+        <div
+            className={cn(
+                "grid transition-all duration-300 ease-in-out",
+                visible ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            )}
+        >
+            <div className="overflow-hidden">
+                {children}
+            </div>
+        </div>
+    );
+};
+
 interface SectionProps {
     title: string;
     icon: React.ElementType;
@@ -36,7 +74,7 @@ const SidebarSection: React.FC<SectionProps> = ({ title, icon: Icon, children, d
             </button>
 
             {isOpen && (
-                <div className="space-y-5 pl-1">
+                <div className="flex flex-col gap-5 pl-1">
                     {children}
                 </div>
             )}
@@ -129,7 +167,7 @@ export const Sidebar = () => {
                 helperText={formatCurrency(downPaymentAmount)}
                 inputClassName="w-20"
             />
-            {inputs.downPaymentPercentage < 20 && (
+            <ExpandableSection isOpen={inputs.downPaymentPercentage < 20}>
                 <SimulationInputGroup
                     label="PMI Rate"
                     value={inputs.pmiRate ?? 0.5}
@@ -140,7 +178,7 @@ export const Sidebar = () => {
                     suffix="%"
                     inputClassName="w-20"
                 />
-            )}
+            </ExpandableSection>
              <SimulationInputGroup
                 label="Interest Rate"
                 value={inputs.mortgageRate}
