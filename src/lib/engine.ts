@@ -180,19 +180,6 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
         const totalOutflow = currentMortgagePayment + monthlyPropertyTax + monthlyMaintenance + monthlyHomeInsurance;
         const realizableEquity = currentHomeValue * (1 - sellingCostPercentage / 100) - remainingPrincipal;
 
-        schedule.push({
-            mortgagePayment: currentMortgagePayment,
-            propertyTax: monthlyPropertyTax,
-            homeInsurance: monthlyHomeInsurance,
-            maintenanceCost: monthlyMaintenance,
-            totalOutflow,
-            interestPayment,
-            principalPayment,
-            remainingPrincipal,
-            homeValue: currentHomeValue,
-            realizableEquity
-        });
-
         // Appreciate home for next month
         const previousHomeValue = currentHomeValue;
         currentHomeValue *= (1 + monthlyAppreciationRate);
