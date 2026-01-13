@@ -288,53 +288,57 @@ export const Sidebar = () => {
                 suffix="%"
                 inputClassName="w-20"
             />
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <div className="flex items-center gap-2">
-                   <label className="text-sm font-medium text-zinc-300">Inflation Rate</label>
-                   <label className="flex items-center gap-1.5 cursor-pointer group">
-                      <Checkbox
-                          checked={inputs.inflationAdjusted ?? false}
-                          onCheckedChange={(checked) => setInputs({ inflationAdjusted: checked })}
-                          className="h-3.5 w-3.5"
-                      />
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400 transition-colors select-none">Adjusted</span>
-                   </label>
+            <div className="space-y-3">
+                <SimulationInputGroup
+                    label="Inflation Rate"
+                    value={inputs.inflationRate}
+                    onChange={update('inflationRate')}
+                    min={0}
+                    max={15}
+                    step={0.1}
+                    suffix="%"
+                    inputClassName="w-20"
+                />
+                <div className="flex items-center gap-2 px-1">
+                    <Checkbox
+                        id="inflation-adjusted"
+                        checked={inputs.inflationAdjusted ?? false}
+                        onCheckedChange={(checked) => setInputs({ inflationAdjusted: checked })}
+                    />
+                    <label
+                        htmlFor="inflation-adjusted"
+                        className="text-xs text-zinc-400 cursor-pointer select-none hover:text-zinc-300 transition-colors"
+                    >
+                        Adjust results for inflation
+                    </label>
                 </div>
-              </div>
-              <SimulationInputGroup
-                  label=""
-                  value={inputs.inflationRate}
-                  onChange={update('inflationRate')}
-                  min={0}
-                  max={15}
-                  step={0.1}
-                  suffix="%"
-                  inputClassName="w-20"
-              />
             </div>
-             <SimulationInputGroup
-                label={
-                    <div className="flex items-center gap-2">
-                        Property Tax
-                        <label className="flex items-center gap-1 text-[10px] text-zinc-500 cursor-pointer select-none hover:text-zinc-300 transition-colors">
-                            <Checkbox
-                                checked={inputs.isProp13 ?? false}
-                                onCheckedChange={(checked) => setInputs({ isProp13: checked })}
-                                className="h-3 w-3"
-                            />
-                            CA Prop 13
-                        </label>
-                    </div>
-                }
-                value={inputs.propertyTaxRate}
-                onChange={update('propertyTaxRate')}
-                min={0}
-                max={5}
-                step={0.1}
-                suffix="%"
-                inputClassName="w-20"
-            />
+
+            <div className="space-y-3">
+                <SimulationInputGroup
+                    label="Property Tax"
+                    value={inputs.propertyTaxRate}
+                    onChange={update('propertyTaxRate')}
+                    min={0}
+                    max={5}
+                    step={0.1}
+                    suffix="%"
+                    inputClassName="w-20"
+                />
+                <div className="flex items-center gap-2 px-1">
+                    <Checkbox
+                        id="prop-13"
+                        checked={inputs.isProp13 ?? false}
+                        onCheckedChange={(checked) => setInputs({ isProp13: checked })}
+                    />
+                    <label
+                        htmlFor="prop-13"
+                        className="text-xs text-zinc-400 cursor-pointer select-none hover:text-zinc-300 transition-colors"
+                    >
+                        Enable CA Prop 13 limits
+                    </label>
+                </div>
+            </div>
              <SimulationInputGroup
                 label="Maintenance"
                 value={inputs.maintenanceCostPercentage}
