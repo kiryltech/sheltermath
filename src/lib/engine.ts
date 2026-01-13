@@ -11,6 +11,7 @@ export interface SimulationParams {
   maintenanceCostPercentage: number; // Annual percentage of home value
   homeAppreciationRate: number; // Annual percentage
   sellingCostPercentage: number; // Cost to sell home (e.g. 6%)
+  pmiRate?: number; // Annual percentage of loan amount (e.g. 0.5%)
 
   // Rental
   monthlyRent: number;
@@ -43,6 +44,7 @@ export interface AnnualFlows {
   ownerTax: number;
   ownerInsurance: number;
   ownerMaintenance: number;
+  ownerPMI: number; // New field for PMI
   ownerHomeAppreciation: number;
   ownerPortfolioContribution: number;
   ownerPortfolioGrowth: number;
@@ -57,9 +59,9 @@ export interface MonthlyCashFlow {
   propertyTax: number;
   homeInsurance: number;
   maintenanceCost: number;
-  totalOwnerCosts: number; // Unrecoverable costs + Interest? No, typically total outflow for cash flow comparison.
-                           // Let's stick to Total Monthly Outflow for this field to match charts usually.
-  totalOwnerOutflow: number; // P&I + Tax + Maint + Insurance.
+  pmiPayment?: number; // Added PMI payment to monthly data for transparency
+  totalOwnerCosts: number; // Unrecoverable costs
+  totalOwnerOutflow: number; // P&I + Tax + Maint + Insurance + PMI
 
   // Renting Costs
   rentPayment: number;
@@ -120,6 +122,7 @@ interface OwnerMonthlyState {
     propertyTax: number;
     homeInsurance: number;
     maintenanceCost: number;
+    pmiPayment: number; // Added field
     totalOutflow: number;
     interestPayment: number;
     principalPayment: number;
@@ -145,13 +148,16 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
         sellingCostPercentage,
         mortgageRate,
         simulationYears,
-        homePrice
+        homePrice,
+        pmiRate = 0 // Default to 0 if not provided
     } = params;
 
     // Use Geometric compounding for appreciation (Effective Annual Rate)
     const monthlyAppreciationRate = calculateMonthlyGeometricRate(homeAppreciationRate);
     // Use Arithmetic (APR) for Mortgage
     const monthlyRate = mortgageRate / 100 / 12;
+    // Calculate Monthly PMI Amount (based on original loan amount)
+    const monthlyPMI = (loanPrincipal * (pmiRate / 100)) / 12;
 
     let currentHomeValue = homePrice;
     let remainingPrincipal = loanPrincipal;
@@ -167,6 +173,7 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
         let currentMortgagePayment = monthlyMortgagePI;
         let interestPayment = 0;
         let principalPayment = 0;
+        let currentPMI = 0;
 
         if (month > loanTermYears * 12) {
             currentMortgagePayment = 0;
@@ -184,11 +191,18 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
                  // To be precise:
                  // currentMortgagePayment = principalPayment + interestPayment;
              }
+
+             // Check for PMI
+             // Applies if LTV > 80% of ORIGINAL home value
+             if (remainingPrincipal > (homePrice * 0.8)) {
+                 currentPMI = monthlyPMI;
+             }
+
              remainingPrincipal -= principalPayment;
              if (remainingPrincipal < 0) remainingPrincipal = 0;
         }
 
-        const totalOutflow = currentMortgagePayment + monthlyPropertyTax + monthlyMaintenance + monthlyHomeInsurance;
+        const totalOutflow = currentMortgagePayment + monthlyPropertyTax + monthlyMaintenance + monthlyHomeInsurance + currentPMI;
         const realizableEquity = currentHomeValue * (1 - sellingCostPercentage / 100) - remainingPrincipal;
 
         // Appreciate home for next month
@@ -201,6 +215,7 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
             propertyTax: monthlyPropertyTax,
             homeInsurance: monthlyHomeInsurance,
             maintenanceCost: monthlyMaintenance,
+            pmiPayment: currentPMI,
             totalOutflow,
             interestPayment,
             principalPayment,
@@ -294,6 +309,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       ownerTax: 0,
       ownerInsurance: 0,
       ownerMaintenance: 0,
+      ownerPMI: 0,
       ownerHomeAppreciation: 0,
       ownerPortfolioContribution: 0,
       ownerPortfolioGrowth: 0
@@ -319,6 +335,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
               ownerTax: 0,
               ownerInsurance: 0,
               ownerMaintenance: 0,
+              ownerPMI: 0,
               ownerHomeAppreciation: 0,
               ownerPortfolioContribution: 0,
               ownerPortfolioGrowth: 0
@@ -373,6 +390,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       currentYearFlows.ownerTax += owner.propertyTax;
       currentYearFlows.ownerInsurance += owner.homeInsurance;
       currentYearFlows.ownerMaintenance += owner.maintenanceCost;
+      currentYearFlows.ownerPMI += owner.pmiPayment;
       currentYearFlows.ownerHomeAppreciation += owner.monthlyAppreciation;
       currentYearFlows.ownerPortfolioContribution += ownerContribution;
       currentYearFlows.ownerPortfolioGrowth += ownerPortfolioGrowth;
@@ -385,7 +403,8 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
           propertyTax: owner.propertyTax,
           homeInsurance: owner.homeInsurance,
           maintenanceCost: owner.maintenanceCost,
-          totalOwnerCosts: owner.propertyTax + owner.homeInsurance + owner.maintenanceCost + owner.interestPayment, // Roughly unrecoverable costs
+          pmiPayment: owner.pmiPayment,
+          totalOwnerCosts: owner.propertyTax + owner.homeInsurance + owner.maintenanceCost + owner.interestPayment + owner.pmiPayment, // Rough unrecoverable costs
           totalOwnerOutflow: owner.totalOutflow,
           rentPayment: renter.rentPayment,
           rentersInsurance: renter.rentersInsurance,
