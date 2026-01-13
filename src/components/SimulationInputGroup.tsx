@@ -34,7 +34,7 @@ export const SimulationInputGroup: React.FC<SimulationInputGroupProps> = ({
         <div className="text-sm font-medium text-zinc-300 flex items-center gap-2">{label}</div>
         <div className="flex items-center gap-2">
           {helperText && (
-            <span className="text-xs text-zinc-500 font-mono tabular-nums">
+            <span className="text-xs text-zinc-500 font-mono tabular-nums mr-1">
               {helperText}
             </span>
           )}

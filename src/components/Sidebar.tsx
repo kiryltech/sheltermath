@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X, DollarSign } from 'lucide-react';
+import { Home, Building, TrendingUp, ChevronDown, ChevronRight, Menu, X, DollarSign } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { SimulationInputGroup } from './SimulationInputGroup';
 import { Checkbox } from './ui/Checkbox';
@@ -192,7 +192,7 @@ export const Sidebar = () => {
         <hr className="border-white/5" />
 
         {/* Section: Property */}
-        <SidebarSection title="Property Basics" icon={Home}>
+        <SidebarSection title="Property Details" icon={Home}>
             <SimulationInputGroup
                 label="Home Price"
                 value={inputs.homePrice}
@@ -250,34 +250,8 @@ export const Sidebar = () => {
 
         <hr className="border-white/5" />
 
-        {/* Section: Savings Discipline */}
-        <SidebarSection title="Savings Discipline" icon={TrendingUp}>
-             <SimulationInputGroup
-                label="Renter Discipline"
-                value={inputs.renterDiscipline}
-                onChange={update('renterDiscipline')}
-                min={0}
-                max={100}
-                step={5}
-                suffix="%"
-                inputClassName="w-20"
-            />
-             <SimulationInputGroup
-                label="Owner Discipline"
-                value={inputs.ownerDiscipline}
-                onChange={update('ownerDiscipline')}
-                min={0}
-                max={100}
-                step={5}
-                suffix="%"
-                inputClassName="w-20"
-            />
-        </SidebarSection>
-
-        <hr className="border-white/5" />
-
-        {/* Section: Rental Market */}
-        <SidebarSection title="Rental Market" icon={Building2}>
+        {/* Section: Rental Details */}
+        <SidebarSection title="Rental Details" icon={Building}>
             <SimulationInputGroup
                 label="Monthly Rent"
                 value={inputs.monthlyRent}
@@ -307,6 +281,32 @@ export const Sidebar = () => {
                 step={5}
                 prefix="$"
                 inputClassName="w-24"
+            />
+        </SidebarSection>
+
+        <hr className="border-white/5" />
+
+        {/* Section: Savings Discipline */}
+        <SidebarSection title="Savings Discipline" icon={TrendingUp}>
+             <SimulationInputGroup
+                label="Renter Discipline"
+                value={inputs.renterDiscipline}
+                onChange={update('renterDiscipline')}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                inputClassName="w-20"
+            />
+             <SimulationInputGroup
+                label="Owner Discipline"
+                value={inputs.ownerDiscipline}
+                onChange={update('ownerDiscipline')}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                inputClassName="w-20"
             />
         </SidebarSection>
 

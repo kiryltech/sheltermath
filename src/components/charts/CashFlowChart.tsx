@@ -21,6 +21,7 @@ export const CashFlowChart = () => {
   const data = monthlyData.filter((_, index) => index % 12 === 0);
 
   const formatCurrency = (value: number) => {
+    if (value >= 1000) return `$${(value / 1000).toFixed(0)}k`;
     return `$${value.toFixed(0)}`;
   };
 
