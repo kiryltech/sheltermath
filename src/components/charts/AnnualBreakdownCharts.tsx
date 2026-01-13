@@ -9,7 +9,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
   ReferenceLine
 } from 'recharts';
 import { useSimulationStore } from '@/store/useSimulationStore';
@@ -32,11 +31,6 @@ export const AnnualBreakdownCharts = () => {
         ownerInsuranceNeg: -flow.ownerInsurance,
         ownerPrincipalNeg: -flow.ownerPrincipalPaid,
         ownerPortfolioContributionNeg: -flow.ownerPortfolioContribution,
-
-        // Positive Flows (Inflows & Growth)
-        // We reuse the existing keys for positive values as they are already positive in annualFlows
-        // but explicit mapping for clarity if needed.
-        // Actually, existing keys are perfect for positive stack.
     }));
   }, [annualFlows]);
 
@@ -115,7 +109,7 @@ export const AnnualBreakdownCharts = () => {
                   top: 20,
                   right: 30,
                   left: 20,
-                  bottom: 5,
+                  bottom: 30,
                 }}
                 stackOffset="sign"
               >
@@ -126,6 +120,7 @@ export const AnnualBreakdownCharts = () => {
                     tick={{fill: '#71717a', fontSize: 12}}
                     tickLine={false}
                     axisLine={false}
+                    minTickGap={20}
                 />
                 <YAxis
                     stroke="#71717a"
@@ -135,17 +130,16 @@ export const AnnualBreakdownCharts = () => {
                     axisLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#3f3f46', opacity: 0.2 }} />
-                <Legend verticalAlign="top" height={36} iconType="circle" />
                 <ReferenceLine y={0} stroke="#52525b" />
 
                 {/* Positive Stack */}
-                <Bar dataKey="renterPortfolioContribution" stackId="a" name="Portfolio Contribution (In)" fill="#3b82f6" />
-                <Bar dataKey="renterPortfolioGrowth" stackId="a" name="Portfolio Growth" fill="#10b981" />
+                <Bar dataKey="renterPortfolioContribution" stackId="a" name="Portfolio Contribution (In)" fill="#3b82f6" stroke="none" />
+                <Bar dataKey="renterPortfolioGrowth" stackId="a" name="Portfolio Growth" fill="#10b981" stroke="none" />
 
                 {/* Negative Stack */}
-                <Bar dataKey="renterRentNeg" stackId="a" name="Rent" fill="#ef4444" />
-                <Bar dataKey="renterInsuranceNeg" stackId="a" name="Insurance" fill="#f97316" />
-                <Bar dataKey="renterPortfolioContributionNeg" stackId="a" name="Portfolio Contribution (Out)" fill="#60a5fa" />
+                <Bar dataKey="renterRentNeg" stackId="a" name="Rent" fill="#ef4444" stroke="none" />
+                <Bar dataKey="renterInsuranceNeg" stackId="a" name="Insurance" fill="#f97316" stroke="none" />
+                <Bar dataKey="renterPortfolioContributionNeg" stackId="a" name="Portfolio Contribution (Out)" fill="#60a5fa" stroke="none" />
               </BarChart>
             </ResponsiveContainer>
         </div>
@@ -160,7 +154,7 @@ export const AnnualBreakdownCharts = () => {
                   top: 20,
                   right: 30,
                   left: 20,
-                  bottom: 5,
+                  bottom: 30,
                 }}
                 stackOffset="sign"
               >
@@ -171,6 +165,7 @@ export const AnnualBreakdownCharts = () => {
                     tick={{fill: '#71717a', fontSize: 12}}
                     tickLine={false}
                     axisLine={false}
+                    minTickGap={20}
                 />
                 <YAxis
                     stroke="#71717a"
@@ -180,22 +175,21 @@ export const AnnualBreakdownCharts = () => {
                     axisLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#3f3f46', opacity: 0.2 }} />
-                <Legend verticalAlign="top" height={36} iconType="circle" />
                 <ReferenceLine y={0} stroke="#52525b" />
 
                 {/* Positive Stack */}
-                <Bar dataKey="ownerPrincipalPaid" stackId="a" name="Principal Paid (In)" fill="#8b5cf6" />
-                <Bar dataKey="ownerPortfolioContribution" stackId="a" name="Portfolio Contribution (In)" fill="#3b82f6" />
-                <Bar dataKey="ownerHomeAppreciation" stackId="a" name="Home Appreciation" fill="#10b981" />
-                <Bar dataKey="ownerPortfolioGrowth" stackId="a" name="Portfolio Growth" fill="#06b6d4" />
+                <Bar dataKey="ownerPrincipalPaid" stackId="a" name="Principal Paid (In)" fill="#8b5cf6" stroke="none" />
+                <Bar dataKey="ownerPortfolioContribution" stackId="a" name="Portfolio Contribution (In)" fill="#3b82f6" stroke="none" />
+                <Bar dataKey="ownerHomeAppreciation" stackId="a" name="Home Appreciation" fill="#10b981" stroke="none" />
+                <Bar dataKey="ownerPortfolioGrowth" stackId="a" name="Portfolio Growth" fill="#06b6d4" stroke="none" />
 
                 {/* Negative Stack */}
-                <Bar dataKey="ownerInterestNeg" stackId="a" name="Mortgage Interest" fill="#ef4444" />
-                <Bar dataKey="ownerTaxNeg" stackId="a" name="Property Tax" fill="#f59e0b" />
-                <Bar dataKey="ownerMaintenanceNeg" stackId="a" name="Maintenance" fill="#eab308" />
-                <Bar dataKey="ownerInsuranceNeg" stackId="a" name="Home Insurance" fill="#f97316" />
-                <Bar dataKey="ownerPrincipalNeg" stackId="a" name="Principal Paid (Out)" fill="#a78bfa" />
-                <Bar dataKey="ownerPortfolioContributionNeg" stackId="a" name="Portfolio Contribution (Out)" fill="#60a5fa" />
+                <Bar dataKey="ownerInterestNeg" stackId="a" name="Mortgage Interest" fill="#ef4444" stroke="none" />
+                <Bar dataKey="ownerTaxNeg" stackId="a" name="Property Tax" fill="#f59e0b" stroke="none" />
+                <Bar dataKey="ownerMaintenanceNeg" stackId="a" name="Maintenance" fill="#eab308" stroke="none" />
+                <Bar dataKey="ownerInsuranceNeg" stackId="a" name="Home Insurance" fill="#f97316" stroke="none" />
+                <Bar dataKey="ownerPrincipalNeg" stackId="a" name="Principal Paid (Out)" fill="#a78bfa" stroke="none" />
+                <Bar dataKey="ownerPortfolioContributionNeg" stackId="a" name="Portfolio Contribution (Out)" fill="#60a5fa" stroke="none" />
 
               </BarChart>
             </ResponsiveContainer>
