@@ -29,6 +29,25 @@ export interface SimulationParams {
   ownerDiscipline: number; // Percentage (0-100) of excess cash invested
 }
 
+export interface AnnualFlows {
+  year: number;
+  // Renter
+  renterRent: number;
+  renterInsurance: number;
+  renterPortfolioContribution: number;
+  renterPortfolioGrowth: number;
+
+  // Owner
+  ownerPrincipalPaid: number;
+  ownerInterestPaid: number;
+  ownerTax: number;
+  ownerInsurance: number;
+  ownerMaintenance: number;
+  ownerHomeAppreciation: number;
+  ownerPortfolioContribution: number;
+  ownerPortfolioGrowth: number;
+}
+
 export interface MonthlyCashFlow {
   month: number;
   year: number;
@@ -64,6 +83,7 @@ export interface AnnualSnapshot {
 export interface SimulationResult {
   monthlyData: MonthlyCashFlow[];
   annualData: AnnualSnapshot[];
+  annualFlows: AnnualFlows[];
   crossoverDate: { year: number; month: number } | null;
   summary: {
     totalInterestPaid: number;
@@ -97,6 +117,7 @@ interface OwnerMonthlyState {
     remainingPrincipal: number;
     homeValue: number;
     realizableEquity: number;
+    monthlyAppreciation: number;
 }
 
 interface RenterMonthlyState {
@@ -173,7 +194,23 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
         });
 
         // Appreciate home for next month
+        const previousHomeValue = currentHomeValue;
         currentHomeValue *= (1 + monthlyAppreciationRate);
+        const monthlyAppreciation = currentHomeValue - previousHomeValue;
+
+        schedule.push({
+            mortgagePayment: currentMortgagePayment,
+            propertyTax: monthlyPropertyTax,
+            homeInsurance: monthlyHomeInsurance,
+            maintenanceCost: monthlyMaintenance,
+            totalOutflow,
+            interestPayment,
+            principalPayment,
+            remainingPrincipal,
+            homeValue: previousHomeValue,
+            realizableEquity,
+            monthlyAppreciation: monthlyAppreciation // Appreciation that happens *after* this month (or during)
+        });
     }
     return schedule;
 }
@@ -240,8 +277,26 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
 
   const monthlyData: MonthlyCashFlow[] = [];
   const annualData: AnnualSnapshot[] = [];
+  const annualFlows: AnnualFlows[] = [];
   let crossoverDate: { year: number; month: number } | null = null;
   let totalInterestPaid = 0;
+
+  // Track aggregations for the current year
+  let currentYearFlows: AnnualFlows = {
+      year: 1,
+      renterRent: 0,
+      renterInsurance: 0,
+      renterPortfolioContribution: 0,
+      renterPortfolioGrowth: 0,
+      ownerPrincipalPaid: 0,
+      ownerInterestPaid: 0,
+      ownerTax: 0,
+      ownerInsurance: 0,
+      ownerMaintenance: 0,
+      ownerHomeAppreciation: 0,
+      ownerPortfolioContribution: 0,
+      ownerPortfolioGrowth: 0
+  };
 
   for (let i = 0; i < simulationYears * 12; i++) {
       const month = i + 1;
@@ -249,11 +304,33 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       const owner = ownerSchedule[i];
       const renter = renterSchedule[i];
 
+      // Reset annual flows if new year
+      if (year > currentYearFlows.year) {
+          annualFlows.push({ ...currentYearFlows });
+          currentYearFlows = {
+              year,
+              renterRent: 0,
+              renterInsurance: 0,
+              renterPortfolioContribution: 0,
+              renterPortfolioGrowth: 0,
+              ownerPrincipalPaid: 0,
+              ownerInterestPaid: 0,
+              ownerTax: 0,
+              ownerInsurance: 0,
+              ownerMaintenance: 0,
+              ownerHomeAppreciation: 0,
+              ownerPortfolioContribution: 0,
+              ownerPortfolioGrowth: 0
+          };
+      }
+
       totalInterestPaid += owner.interestPayment;
 
       // Difference
       const diff = owner.totalOutflow - renter.totalOutflow;
       let investedAmount = 0;
+      let renterContribution = 0;
+      let ownerContribution = 0;
 
       if (diff > 0) {
           // Renter saves (Owner spends more)
@@ -261,21 +338,43 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
           const savings = diff;
           investedAmount = savings * (renterDiscipline / 100);
           renterInvestmentPortfolio += investedAmount;
+          renterContribution = investedAmount;
       } else {
           // Owner saves (Renter spends more)
           // Owner saves the difference * discipline
           const savings = -diff;
           investedAmount = savings * (ownerDiscipline / 100);
           ownerInvestmentPortfolio += investedAmount;
+          ownerContribution = investedAmount;
       }
 
       // Growth
+      const ownerPortfolioBefore = ownerInvestmentPortfolio;
       ownerInvestmentPortfolio *= (1 + monthlyInvestmentReturn);
+      const ownerPortfolioGrowth = ownerInvestmentPortfolio - ownerPortfolioBefore;
+
+      const renterPortfolioBefore = renterInvestmentPortfolio;
       renterInvestmentPortfolio *= (1 + monthlyInvestmentReturn);
+      const renterPortfolioGrowth = renterInvestmentPortfolio - renterPortfolioBefore;
 
       // Net Worth
       const ownerNetWorth = owner.realizableEquity + ownerInvestmentPortfolio;
       const renterNetWorth = renterInvestmentPortfolio;
+
+      // Accumulate Annual Flows
+      currentYearFlows.renterRent += renter.rentPayment;
+      currentYearFlows.renterInsurance += renter.rentersInsurance;
+      currentYearFlows.renterPortfolioContribution += renterContribution;
+      currentYearFlows.renterPortfolioGrowth += renterPortfolioGrowth;
+
+      currentYearFlows.ownerPrincipalPaid += owner.principalPayment;
+      currentYearFlows.ownerInterestPaid += owner.interestPayment;
+      currentYearFlows.ownerTax += owner.propertyTax;
+      currentYearFlows.ownerInsurance += owner.homeInsurance;
+      currentYearFlows.ownerMaintenance += owner.maintenanceCost;
+      currentYearFlows.ownerHomeAppreciation += owner.monthlyAppreciation;
+      currentYearFlows.ownerPortfolioContribution += ownerContribution;
+      currentYearFlows.ownerPortfolioGrowth += ownerPortfolioGrowth;
 
       // Record Data
       monthlyData.push({
@@ -301,6 +400,11 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       }
   }
 
+  // Push the last partial year (or full last year)
+  if (monthlyData.length > 0) {
+      annualFlows.push(currentYearFlows);
+  }
+
   // Generate Annual Data
   for (let y = 1; y <= simulationYears; y++) {
     const monthIndex = y * 12 - 1;
@@ -318,6 +422,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
   return {
     monthlyData,
     annualData,
+    annualFlows,
     crossoverDate,
     summary: {
       totalInterestPaid,

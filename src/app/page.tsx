@@ -1,6 +1,7 @@
 import { Sidebar } from '@/components/Sidebar';
 import { NetWorthChart } from '@/components/charts/NetWorthChart';
 import { CashFlowChart } from '@/components/charts/CashFlowChart';
+import { AnnualBreakdownCharts } from '@/components/charts/AnnualBreakdownCharts';
 import { SummaryMetrics } from '@/components/SummaryMetrics';
 
 export default function Home() {
@@ -19,6 +20,10 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <NetWorthChart />
                 <CashFlowChart />
+            </div>
+
+            <div className="mb-8">
+              <AnnualBreakdownCharts />
             </div>
         </div>
       </main>
