@@ -33,7 +33,11 @@ describe('simulateTimeline', () => {
     inflationRate: 2.5,
     simulationYears: 45,
     renterDiscipline: 100,
-    ownerDiscipline: 100
+    ownerDiscipline: 100,
+    grossIncome: 120000,
+    federalTaxRate: 22,
+    stateTaxRate: 5,
+    incomeGrowthRate: 3.0
   };
 
   it('generates correct number of months', () => {
