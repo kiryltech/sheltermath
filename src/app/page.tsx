@@ -1,10 +1,17 @@
+"use client";
+
+import React, { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { NetWorthChart } from '@/components/charts/NetWorthChart';
 import { CashFlowChart } from '@/components/charts/CashFlowChart';
 import { AnnualBreakdownCharts } from '@/components/charts/AnnualBreakdownCharts';
 import { SummaryMetrics } from '@/components/SummaryMetrics';
+import { Modal } from '@/components/ui/Modal';
+import { BarChart3 } from 'lucide-react';
 
 export default function Home() {
+  const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
+
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden flex-col md:flex-row">
       <Sidebar />
@@ -22,9 +29,24 @@ export default function Home() {
                 <CashFlowChart />
             </div>
 
-            <div className="mb-8">
-              <AnnualBreakdownCharts />
+            <div className="mb-8 flex justify-center">
+              <button
+                onClick={() => setIsBreakdownOpen(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-lg transition-colors border border-zinc-700 hover:border-zinc-600 shadow-sm"
+              >
+                <BarChart3 className="w-5 h-5" />
+                View Annual Breakdown
+              </button>
             </div>
+
+            <Modal
+              isOpen={isBreakdownOpen}
+              onClose={() => setIsBreakdownOpen(false)}
+              title="Annual Breakdown"
+              className="max-w-7xl"
+            >
+              {isBreakdownOpen && <AnnualBreakdownCharts />}
+            </Modal>
         </div>
       </main>
     </div>
