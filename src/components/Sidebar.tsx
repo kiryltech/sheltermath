@@ -19,6 +19,7 @@ const formatCurrency = (val: number) => {
 const ExpandableSection = ({ isOpen, children }: { isOpen: boolean, children: React.ReactNode }) => {
     const [render, setRender] = useState(isOpen);
     const [visible, setVisible] = useState(isOpen);
+    const [isFullyOpen, setIsFullyOpen] = useState(isOpen);
 
     useEffect(() => {
         if (isOpen) {
@@ -29,7 +30,13 @@ const ExpandableSection = ({ isOpen, children }: { isOpen: boolean, children: Re
                     setVisible(true);
                 });
             });
+            // Set overflow visible after transition
+            const timer = setTimeout(() => {
+                setIsFullyOpen(true);
+            }, 300);
+            return () => clearTimeout(timer);
         } else {
+            setIsFullyOpen(false);
             setVisible(false);
             const timer = setTimeout(() => {
                 setRender(false);
@@ -47,7 +54,7 @@ const ExpandableSection = ({ isOpen, children }: { isOpen: boolean, children: Re
                 visible ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
             )}
         >
-            <div className="overflow-hidden">
+            <div className={cn("min-h-0", isFullyOpen ? "overflow-visible" : "overflow-hidden")}>
                 {children}
             </div>
         </div>
