@@ -9,6 +9,7 @@ import { HousingIncomeRatioChart } from '@/components/charts/HousingIncomeRatioC
 import { LifestyleBudgetChart } from '@/components/charts/LifestyleBudgetChart';
 import { SummaryMetrics } from '@/components/SummaryMetrics';
 import { Modal } from '@/components/ui/Modal';
+import { Footer } from '@/components/Footer';
 import { BarChart3 } from 'lucide-react';
 
 export default function Home() {
@@ -54,6 +55,8 @@ export default function Home() {
             >
               {isBreakdownOpen && <AnnualBreakdownCharts />}
             </Modal>
+
+            <Footer />
         </div>
       </main>
     </div>
