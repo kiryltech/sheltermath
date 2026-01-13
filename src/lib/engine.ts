@@ -1,3 +1,4 @@
+
 // Simulation Parameters
 export interface SimulationParams {
   // Property
@@ -22,6 +23,10 @@ export interface SimulationParams {
 
   // Simulation
   simulationYears: number;
+
+  // Discipline
+  renterDiscipline: number; // Percentage (0-100) of excess cash invested
+  ownerDiscipline: number; // Percentage (0-100) of excess cash invested
 }
 
 export interface MonthlyCashFlow {
@@ -29,20 +34,12 @@ export interface MonthlyCashFlow {
   year: number;
 
   // Buying Costs
-  mortgagePayment: number; // P&I (Fixed)
+  mortgagePayment: number; // P&I (Fixed, then 0)
   propertyTax: number;
-  homeInsurance: number; // (Usually part of escrow, but let's assume included in maintenance or separate? Design doc says: Tax + Insurance + Maintenance)
-                         // Wait, design doc says "Owner Cost: Mortgage (P&I) + Tax + Insurance + Maintenance".
-                         // I missed homeInsurance in params. I should add it or assume it's part of maintenance/tax.
-                         // Let's stick to design doc: "Tax + Insurance + Maintenance".
-                         // Params in design doc: "Property Tax Rate", "Maintenance Costs". No explicit Home Insurance input in design doc params list?
-                         // "Tax + Insurance + Maintenance" is listed in Cash Flow Calculation.
-                         // "Property Tax Rate (%)" and "Maintenance Costs (% of value)" are in Input Parameters.
-                         // Missing "Home Owners Insurance". I will add it to params.
+  homeInsurance: number;
   maintenanceCost: number;
-  totalOwnerCosts: number; // Unrecoverable costs? Or total cash outflow?
-                           // Design doc: "Cash Flow Chart... Line A (Buy): Starts high... (only tax/maint creep up)."
-                           // This implies Line A is Total Monthly Outflow.
+  totalOwnerCosts: number; // Unrecoverable costs + Interest? No, typically total outflow for cash flow comparison.
+                           // Let's stick to Total Monthly Outflow for this field to match charts usually.
   totalOwnerOutflow: number; // P&I + Tax + Maint + Insurance.
 
   // Renting Costs
@@ -52,7 +49,7 @@ export interface MonthlyCashFlow {
 
   // Difference
   savings: number; // Absolute difference |OwnerOutflow - RenterOutflow|
-  investedAmount: number; // The amount added to investment pool this month.
+  investedAmount: number; // The amount added to investment pool this month (after discipline).
   ownerNetWorth: number;
   renterNetWorth: number;
 }
@@ -77,10 +74,6 @@ export interface SimulationResult {
 
 /**
  * Calculates the monthly mortgage payment (Principal + Interest).
- * Formula: M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1 ]
- * P = Principal loan amount
- * i = Monthly interest rate
- * n = Number of months required to repay the loan
  */
 export function calculateMonthlyPayments(principal: number, annualRate: number, years: number): number {
   if (annualRate === 0) return principal / (years * 12);
@@ -93,6 +86,128 @@ export function calculateMonthlyPayments(principal: number, annualRate: number, 
   );
 }
 
+interface OwnerMonthlyState {
+    mortgagePayment: number;
+    propertyTax: number;
+    homeInsurance: number;
+    maintenanceCost: number;
+    totalOutflow: number;
+    interestPayment: number;
+    principalPayment: number;
+    remainingPrincipal: number;
+    homeValue: number;
+    realizableEquity: number;
+}
+
+interface RenterMonthlyState {
+    rentPayment: number;
+    rentersInsurance: number;
+    totalOutflow: number;
+}
+
+function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: number, loanPrincipal: number): OwnerMonthlyState[] {
+    const {
+        loanTermYears,
+        propertyTaxRate,
+        homeInsuranceRate,
+        maintenanceCostPercentage,
+        homeAppreciationRate,
+        sellingCostPercentage,
+        mortgageRate,
+        simulationYears,
+        homePrice
+    } = params;
+
+    const monthlyAppreciationRate = homeAppreciationRate / 100 / 12;
+    const monthlyRate = mortgageRate / 100 / 12;
+
+    let currentHomeValue = homePrice;
+    let remainingPrincipal = loanPrincipal;
+    const schedule: OwnerMonthlyState[] = [];
+
+    for (let month = 1; month <= simulationYears * 12; month++) {
+        // Costs based on current home value
+        const monthlyPropertyTax = (currentHomeValue * (propertyTaxRate / 100)) / 12;
+        const monthlyMaintenance = (currentHomeValue * (maintenanceCostPercentage / 100)) / 12;
+        const monthlyHomeInsurance = (currentHomeValue * (homeInsuranceRate / 100)) / 12;
+
+        // Mortgage
+        let currentMortgagePayment = monthlyMortgagePI;
+        let interestPayment = 0;
+        let principalPayment = 0;
+
+        if (month > loanTermYears * 12) {
+            currentMortgagePayment = 0;
+            interestPayment = 0;
+            principalPayment = 0;
+            remainingPrincipal = 0; // Should be 0 already
+        } else {
+             interestPayment = remainingPrincipal * monthlyRate;
+             principalPayment = currentMortgagePayment - interestPayment;
+
+             // Handle final payment dust
+             if (remainingPrincipal < principalPayment) {
+                 principalPayment = remainingPrincipal;
+                 // Adjust mortgage payment for last month? Usually kept constant, but principal drops.
+                 // To be precise:
+                 // currentMortgagePayment = principalPayment + interestPayment;
+             }
+             remainingPrincipal -= principalPayment;
+             if (remainingPrincipal < 0) remainingPrincipal = 0;
+        }
+
+        const totalOutflow = currentMortgagePayment + monthlyPropertyTax + monthlyMaintenance + monthlyHomeInsurance;
+        const realizableEquity = currentHomeValue * (1 - sellingCostPercentage / 100) - remainingPrincipal;
+
+        schedule.push({
+            mortgagePayment: currentMortgagePayment,
+            propertyTax: monthlyPropertyTax,
+            homeInsurance: monthlyHomeInsurance,
+            maintenanceCost: monthlyMaintenance,
+            totalOutflow,
+            interestPayment,
+            principalPayment,
+            remainingPrincipal,
+            homeValue: currentHomeValue,
+            realizableEquity
+        });
+
+        // Appreciate home for next month
+        currentHomeValue *= (1 + monthlyAppreciationRate);
+    }
+    return schedule;
+}
+
+function calculateRenterSchedule(params: SimulationParams): RenterMonthlyState[] {
+    const {
+        monthlyRent,
+        rentInflationRate,
+        rentersInsuranceMonthly,
+        simulationYears
+    } = params;
+
+    let currentRent = monthlyRent;
+    let currentRentersInsurance = rentersInsuranceMonthly;
+    const schedule: RenterMonthlyState[] = [];
+
+    for (let month = 1; month <= simulationYears * 12; month++) {
+        const totalOutflow = currentRent + currentRentersInsurance;
+
+        schedule.push({
+            rentPayment: currentRent,
+            rentersInsurance: currentRentersInsurance,
+            totalOutflow
+        });
+
+        // Annual inflation
+        if (month % 12 === 0) {
+            currentRent *= (1 + rentInflationRate / 100);
+            currentRentersInsurance *= (1 + rentInflationRate / 100);
+        }
+    }
+    return schedule;
+}
+
 /**
  * Simulates the timeline for Buying vs Renting.
  */
@@ -102,147 +217,91 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
     downPaymentPercentage,
     mortgageRate,
     loanTermYears,
-    propertyTaxRate,
-    homeInsuranceRate,
-    maintenanceCostPercentage,
-    homeAppreciationRate,
-    sellingCostPercentage,
-    monthlyRent,
-    rentInflationRate,
-    rentersInsuranceMonthly,
     investmentReturnRate,
     simulationYears,
+    renterDiscipline = 100, // Default to 100 if undefined (though interface requires it)
+    ownerDiscipline = 100
   } = params;
 
   // Initial calculations
   const downPayment = homePrice * (downPaymentPercentage / 100);
   const loanPrincipal = homePrice - downPayment;
   const monthlyMortgagePI = calculateMonthlyPayments(loanPrincipal, mortgageRate, loanTermYears);
-
-  // Monthly rates
-  const monthlyAppreciationRate = homeAppreciationRate / 100 / 12;
   const monthlyInvestmentReturn = investmentReturnRate / 100 / 12;
 
-  let currentHomeValue = homePrice;
-  let currentRent = monthlyRent;
-  let currentRentersInsurance = rentersInsuranceMonthly;
+  // Generate Schedules
+  const ownerSchedule = calculateOwnerSchedule(params, monthlyMortgagePI, loanPrincipal);
+  const renterSchedule = calculateRenterSchedule(params);
 
+  // Calculate Investments and Net Worth
   let ownerInvestmentPortfolio = 0;
-  // Renter invests the down payment they didn't spend on the house.
-  // Ideally, this should also include the buyer's closing costs (approx 2-5%),
-  // but since that's not an input param, we start with just the down payment.
+  // Renter invests the down payment
   let renterInvestmentPortfolio = downPayment;
-
-  let remainingPrincipal = loanPrincipal;
 
   const monthlyData: MonthlyCashFlow[] = [];
   const annualData: AnnualSnapshot[] = [];
-
   let crossoverDate: { year: number; month: number } | null = null;
   let totalInterestPaid = 0;
 
-  for (let month = 1; month <= simulationYears * 12; month++) {
-    const year = Math.ceil(month / 12);
+  for (let i = 0; i < simulationYears * 12; i++) {
+      const month = i + 1;
+      const year = Math.ceil(month / 12);
+      const owner = ownerSchedule[i];
+      const renter = renterSchedule[i];
 
-    // --- BUYER COSTS ---
-    // P&I is fixed
-    // Tax, Maint, Insurance are monthly values
-    // Assuming Tax/Maint/Ins are % of Current Home Value.
-    // Note: If they inflate annually, we might update them only at year start.
-    // "Tax/Ins/Maint inflate annually".
-    // I will use the value at the start of the year or update monthly.
-    // Let's update monthly based on current home value for smoothness, or keep flat for the year?
-    // "Inflate annually" suggests step function.
-    // But appreciation is usually modeled continuously or annually.
-    // Let's use continuous appreciation for home value, and calculate costs based on that.
+      totalInterestPaid += owner.interestPayment;
 
-    // Actually, tax is usually based on assessed value.
-    // To match "Inflate annually", I should probably increase the cost by inflation or appreciation once a year.
-    // However, simplicity: Calculate as % of current home value.
-    // Wait, if I do % of home value, and home value appreciates, then costs appreciate.
+      // Difference
+      const diff = owner.totalOutflow - renter.totalOutflow;
+      let investedAmount = 0;
 
-    const monthlyPropertyTax = (currentHomeValue * (propertyTaxRate / 100)) / 12;
-    const monthlyMaintenance = (currentHomeValue * (maintenanceCostPercentage / 100)) / 12;
-    const monthlyHomeInsurance = (currentHomeValue * (homeInsuranceRate / 100)) / 12;
+      if (diff > 0) {
+          // Renter saves (Owner spends more)
+          // Renter saves the difference * discipline
+          const savings = diff;
+          investedAmount = savings * (renterDiscipline / 100);
+          renterInvestmentPortfolio += investedAmount;
+      } else {
+          // Owner saves (Renter spends more)
+          // Owner saves the difference * discipline
+          const savings = -diff;
+          investedAmount = savings * (ownerDiscipline / 100);
+          ownerInvestmentPortfolio += investedAmount;
+      }
 
-    const totalOwnerOutflow = monthlyMortgagePI + monthlyPropertyTax + monthlyMaintenance + monthlyHomeInsurance;
+      // Growth
+      ownerInvestmentPortfolio *= (1 + monthlyInvestmentReturn);
+      renterInvestmentPortfolio *= (1 + monthlyInvestmentReturn);
 
-    // --- RENTER COSTS ---
-    const totalRenterOutflow = currentRent + currentRentersInsurance;
+      // Net Worth
+      const ownerNetWorth = owner.realizableEquity + ownerInvestmentPortfolio;
+      const renterNetWorth = renterInvestmentPortfolio;
 
-    // --- INVEST THE DIFFERENCE ---
-    const savings = Math.abs(totalOwnerOutflow - totalRenterOutflow);
+      // Record Data
+      monthlyData.push({
+          month,
+          year,
+          mortgagePayment: owner.mortgagePayment,
+          propertyTax: owner.propertyTax,
+          homeInsurance: owner.homeInsurance,
+          maintenanceCost: owner.maintenanceCost,
+          totalOwnerCosts: owner.propertyTax + owner.homeInsurance + owner.maintenanceCost + owner.interestPayment, // Roughly unrecoverable costs
+          totalOwnerOutflow: owner.totalOutflow,
+          rentPayment: renter.rentPayment,
+          rentersInsurance: renter.rentersInsurance,
+          totalRenterOutflow: renter.totalOutflow,
+          savings: Math.abs(diff),
+          investedAmount, // This is the amount actually invested (after discipline)
+          ownerNetWorth,
+          renterNetWorth
+      });
 
-    if (totalRenterOutflow < totalOwnerOutflow) {
-      // Rent is cheaper. Renter invests savings.
-      renterInvestmentPortfolio += savings;
-    } else {
-      // Buy is cheaper. Owner invests savings.
-      ownerInvestmentPortfolio += savings;
-    }
-
-    // --- INVESTMENT GROWTH ---
-    // Apply monthly return
-    ownerInvestmentPortfolio *= (1 + monthlyInvestmentReturn);
-    renterInvestmentPortfolio *= (1 + monthlyInvestmentReturn);
-
-    // --- MORTGAGE AMORTIZATION ---
-    const interestPayment = remainingPrincipal * (mortgageRate / 100 / 12);
-    let principalPayment = monthlyMortgagePI - interestPayment;
-    if (remainingPrincipal < principalPayment) {
-        principalPayment = remainingPrincipal;
-    }
-
-    if (remainingPrincipal > 0) {
-        remainingPrincipal -= principalPayment;
-        totalInterestPaid += interestPayment;
-    }
-
-    // --- TRACKING ---
-    // Owner Net Worth = (Home Value - Selling Costs - Remaining Principal) + Investments
-    // Selling costs (e.g. 6%) are important for "Real" Net Worth.
-    // const equity = currentHomeValue - remainingPrincipal; // Unused
-    const realizableEquity = currentHomeValue * (1 - sellingCostPercentage/100) - remainingPrincipal;
-    const ownerNetWorth = realizableEquity + ownerInvestmentPortfolio;
-
-    const renterNetWorth = renterInvestmentPortfolio;
-
-    monthlyData.push({
-      month,
-      year,
-      mortgagePayment: monthlyMortgagePI,
-      propertyTax: monthlyPropertyTax,
-      homeInsurance: monthlyHomeInsurance,
-      maintenanceCost: monthlyMaintenance,
-      totalOwnerCosts: monthlyPropertyTax + monthlyHomeInsurance + monthlyMaintenance + interestPayment, // Unrecoverable?
-      totalOwnerOutflow,
-      rentPayment: currentRent,
-      rentersInsurance: currentRentersInsurance,
-      totalRenterOutflow,
-      savings,
-      investedAmount: savings,
-      ownerNetWorth,
-      renterNetWorth
-    });
-
-    if (!crossoverDate && ownerNetWorth > renterNetWorth) {
-      crossoverDate = { year, month };
-    }
-
-    // --- UPDATES FOR NEXT MONTH ---
-    // Appreciate Home
-    currentHomeValue *= (1 + monthlyAppreciationRate);
-
-    // Inflate Rent & Renter Insurance (Annually? or Monthly?)
-    // "Rent Inflation Rate" usually annual.
-    // "Inflates annually" -> step change at month 13, 25, etc.
-    if (month % 12 === 0) {
-        currentRent *= (1 + rentInflationRate / 100);
-        currentRentersInsurance *= (1 + rentInflationRate / 100); // Assuming same inflation
-    }
+      if (!crossoverDate && ownerNetWorth > renterNetWorth) {
+          crossoverDate = { year, month };
+      }
   }
 
-  // Annual Snapshots (End of each year)
+  // Generate Annual Data
   for (let y = 1; y <= simulationYears; y++) {
     const monthIndex = y * 12 - 1;
     if (monthIndex < monthlyData.length) {
@@ -256,12 +315,9 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
     }
   }
 
-  // Re-run loop or better: Add net worth to MonthlyCashFlow
-  // I will add net worth fields to MonthlyCashFlow.
-
   return {
-    monthlyData, // Updated interface needed
-    annualData, // Need to populate
+    monthlyData,
+    annualData,
     crossoverDate,
     summary: {
       totalInterestPaid,

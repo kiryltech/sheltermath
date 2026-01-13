@@ -31,13 +31,15 @@ describe('simulateTimeline', () => {
     rentersInsuranceMonthly: 20,
     investmentReturnRate: 7.0,
     inflationRate: 2.5,
-    simulationYears: 30,
+    simulationYears: 45,
+    renterDiscipline: 100,
+    ownerDiscipline: 100
   };
 
   it('generates correct number of months', () => {
     const result = simulateTimeline(defaultParams);
-    expect(result.monthlyData).toHaveLength(30 * 12);
-    expect(result.annualData).toHaveLength(30);
+    expect(result.monthlyData).toHaveLength(45 * 12);
+    expect(result.annualData).toHaveLength(45);
   });
 
   it('calculates crossover point correctly', () => {
@@ -64,24 +66,53 @@ describe('simulateTimeline', () => {
   it('correctly amortizes the loan', () => {
       const result = simulateTimeline(defaultParams);
       // After 30 years, loan should be 0.
-      // But we track remaining principal in the loop.
-      // We can check equity vs home value.
-      const lastMonth = result.monthlyData[result.monthlyData.length - 1];
-      // Since we don't expose remainingPrincipal directly in MonthlyCashFlow,
-      // we can infer it or check if interest payment is close to 0?
-      // Actually we expose mortgagePayment (fixed).
-      // But we can check if ownerNetWorth is roughly HomeValue + Investments (minus selling costs).
-      // At end of term, principal is 0.
+      // We check if at year 31, the mortgage payment is 0
+      const month361 = result.monthlyData[360]; // Month 361
+      expect(month361.mortgagePayment).toBe(0);
+  });
 
-      // Calculate expected home value
-      const expectedHomeValue = 500000 * Math.pow(1 + 0.03, 30);
-      // Selling costs
-      const sellingCosts = expectedHomeValue * 0.06;
-      const expectedEquity = expectedHomeValue - sellingCosts;
+  it('reduces owner costs after mortgage payoff', () => {
+      const result = simulateTimeline(defaultParams);
+      const month360 = result.monthlyData[359]; // Last month of mortgage
+      const month361 = result.monthlyData[360]; // First month of no mortgage
 
-      // We need to account for investments.
-      // We can't easily predict exact investments without replicating logic,
-      // but we can check if ownerNetWorth >= expectedEquity.
-      expect(lastMonth.ownerNetWorth).toBeGreaterThan(expectedEquity);
+      // Owner outflow should drop significantly
+      expect(month361.totalOwnerOutflow).toBeLessThan(month360.totalOwnerOutflow);
+      // Specifically, by approx mortgage payment amount (ignoring slight tax/maint inflation)
+      const diff = month360.totalOwnerOutflow - month361.totalOwnerOutflow;
+      expect(diff).toBeCloseTo(month360.mortgagePayment, -2); // Roughly
+  });
+
+  it('applies renter discipline correctly', () => {
+      // Case where Renter Saves
+      const params100 = { ...defaultParams, monthlyRent: 1000, homePrice: 1000000, renterDiscipline: 100 };
+      const result100 = simulateTimeline(params100);
+
+      const params50 = { ...defaultParams, monthlyRent: 1000, homePrice: 1000000, renterDiscipline: 50 };
+      const result50 = simulateTimeline(params50);
+
+      const lastMonth100 = result100.monthlyData[result100.monthlyData.length - 1];
+      const lastMonth50 = result50.monthlyData[result50.monthlyData.length - 1];
+
+      // Net worth with 50% discipline should be lower (but not exactly half due to down payment compounding)
+      // Actually, down payment is invested regardless of discipline?
+      // The code says: `let renterInvestmentPortfolio = downPayment;`
+      // Discipline only applies to monthly savings.
+      expect(lastMonth50.renterNetWorth).toBeLessThan(lastMonth100.renterNetWorth);
+  });
+
+  it('applies owner discipline correctly', () => {
+      // Case where Owner Saves
+      // Make rent very high so Owner saves
+      const params100 = { ...defaultParams, monthlyRent: 10000, homePrice: 300000, ownerDiscipline: 100 };
+      const result100 = simulateTimeline(params100);
+
+      const params50 = { ...defaultParams, monthlyRent: 10000, homePrice: 300000, ownerDiscipline: 50 };
+      const result50 = simulateTimeline(params50);
+
+      const lastMonth100 = result100.monthlyData[result100.monthlyData.length - 1];
+      const lastMonth50 = result50.monthlyData[result50.monthlyData.length - 1];
+
+      expect(lastMonth50.ownerNetWorth).toBeLessThan(lastMonth100.ownerNetWorth);
   });
 });
