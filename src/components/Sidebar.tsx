@@ -153,6 +153,32 @@ export const Sidebar = () => {
 
         <hr className="border-white/5" />
 
+        {/* Section: Savings Discipline */}
+        <SidebarSection title="Savings Discipline" icon={TrendingUp}>
+             <SimulationInputGroup
+                label="Renter Discipline"
+                value={inputs.renterDiscipline}
+                onChange={update('renterDiscipline')}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                inputClassName="w-20"
+            />
+             <SimulationInputGroup
+                label="Owner Discipline"
+                value={inputs.ownerDiscipline}
+                onChange={update('ownerDiscipline')}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                inputClassName="w-20"
+            />
+        </SidebarSection>
+
+        <hr className="border-white/5" />
+
         {/* Section: Rental Market */}
         <SidebarSection title="Rental Market" icon={Building2}>
             <SimulationInputGroup
