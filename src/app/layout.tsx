@@ -14,8 +14,31 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://sheltermath.engineeringthefuture.ai/'),
   title: "Shelter Math | Rent vs Buy Simulator",
   description: "A brutally logical Rent vs Buy simulator with interactive charts and AI analysis.",
+  openGraph: {
+    title: "Shelter Math | Rent vs Buy Simulator",
+    description: "A brutally logical Rent vs Buy simulator with interactive charts and AI analysis.",
+    url: "https://sheltermath.engineeringthefuture.ai/",
+    siteName: "Shelter Math",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/og_image.png",
+        width: 1200,
+        height: 630,
+        alt: "Shelter Math - Rent vs Buy Simulator",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shelter Math | Rent vs Buy Simulator",
+    description: "A brutally logical Rent vs Buy simulator with interactive charts and AI analysis.",
+    images: ["/og_image.png"],
+  },
 };
 
 export default function RootLayout({
