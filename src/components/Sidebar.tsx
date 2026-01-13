@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { SimulationInputGroup } from './SimulationInputGroup';
+import { Checkbox } from './ui/Checkbox';
 import { cn } from '@/lib/utils';
 import { APP_NAME, APP_VERSION } from '@/lib/config';
 
@@ -292,17 +293,11 @@ export const Sidebar = () => {
                 <div className="flex items-center gap-2">
                    <label className="text-sm font-medium text-zinc-300">Inflation Rate</label>
                    <label className="flex items-center gap-1.5 cursor-pointer group">
-                      <div className="relative flex items-center">
-                          <input
-                              type="checkbox"
-                              checked={inputs.inflationAdjusted ?? false}
-                              onChange={(e) => setInputs({ inflationAdjusted: e.target.checked })}
-                              className="peer h-3.5 w-3.5 appearance-none rounded border border-zinc-600 bg-zinc-900/50 checked:bg-primary checked:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
-                          />
-                          <svg className="absolute w-2.5 h-2.5 text-white left-0.5 opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" viewBox="0 0 14 14" fill="none">
-                              <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                      </div>
+                      <Checkbox
+                          checked={inputs.inflationAdjusted ?? false}
+                          onCheckedChange={(checked) => setInputs({ inflationAdjusted: checked })}
+                          className="h-3.5 w-3.5"
+                      />
                       <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400 transition-colors select-none">Adjusted</span>
                    </label>
                 </div>
@@ -323,11 +318,10 @@ export const Sidebar = () => {
                     <div className="flex items-center gap-2">
                         Property Tax
                         <label className="flex items-center gap-1 text-[10px] text-zinc-500 cursor-pointer select-none hover:text-zinc-300 transition-colors">
-                            <input
-                                type="checkbox"
+                            <Checkbox
                                 checked={inputs.isProp13 ?? false}
-                                onChange={(e) => setInputs({ isProp13: e.target.checked })}
-                                className="rounded border-zinc-700 bg-zinc-800 text-primary focus:ring-primary/50 w-3 h-3"
+                                onCheckedChange={(checked) => setInputs({ isProp13: checked })}
+                                className="h-3 w-3"
                             />
                             CA Prop 13
                         </label>
