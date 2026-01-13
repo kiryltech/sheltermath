@@ -10,14 +10,26 @@ import { LifestyleBudgetChart } from '@/components/charts/LifestyleBudgetChart';
 import { SummaryMetrics } from '@/components/SummaryMetrics';
 import { Modal } from '@/components/ui/Modal';
 import { Footer } from '@/components/Footer';
-import { BarChart3, Bot } from 'lucide-react';
+import { BarChart3, Bot, Copy, Check } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { cn } from '@/lib/utils';
 
 export default function Home() {
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { inputs, setInputs } = useSimulationStore();
+
+  const handleCopy = async () => {
+    try {
+      const state = useSimulationStore.getState();
+      await navigator.clipboard.writeText(JSON.stringify(state.results, null, 2));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy engine response:', err);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden flex-col md:flex-row">
@@ -56,6 +68,17 @@ export default function Home() {
                             aria-label="AI Assistant"
                         >
                             <Bot className="w-5 h-5" />
+                        </button>
+                    </Tooltip>
+
+                    {/* Copy State Button */}
+                    <Tooltip content="Copy Engine Response">
+                        <button
+                            onClick={handleCopy}
+                            className="p-2 text-zinc-400 bg-zinc-800/50 border border-zinc-700 rounded-lg hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
+                            aria-label="Copy Engine Response"
+                        >
+                            {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                         </button>
                     </Tooltip>
                 </div>
