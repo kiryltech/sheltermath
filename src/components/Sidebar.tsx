@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X, DollarSign } from 'lucide-react';
+import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X, DollarSign, CircleHelp } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { SimulationInputGroup } from './SimulationInputGroup';
 import { Checkbox } from './ui/Checkbox';
+import { Tooltip } from './ui/Tooltip';
 import { cn } from '@/lib/utils';
 import { APP_NAME, APP_VERSION } from '@/lib/config';
 
@@ -149,6 +150,7 @@ export const Sidebar = () => {
         <SidebarSection title="Household Income" icon={DollarSign}>
             <SimulationInputGroup
                 label="Gross Income"
+                tooltip="Annual pre-tax household income."
                 value={inputs.grossIncome}
                 onChange={update('grossIncome')}
                 min={30000}
@@ -159,6 +161,7 @@ export const Sidebar = () => {
             />
             <SimulationInputGroup
                 label="Federal Tax"
+                tooltip="Effective federal income tax rate."
                 value={inputs.federalTaxRate}
                 onChange={update('federalTaxRate')}
                 min={0}
@@ -169,6 +172,7 @@ export const Sidebar = () => {
             />
             <SimulationInputGroup
                 label="State Tax"
+                tooltip="Effective state income tax rate."
                 value={inputs.stateTaxRate}
                 onChange={update('stateTaxRate')}
                 min={0}
@@ -179,6 +183,7 @@ export const Sidebar = () => {
             />
              <SimulationInputGroup
                 label="Income Growth"
+                tooltip="Annual percentage increase in income. Defaults to inflation rate."
                 value={inputs.incomeGrowthRate ?? inputs.inflationRate}
                 onChange={update('incomeGrowthRate')}
                 min={0}
@@ -195,6 +200,7 @@ export const Sidebar = () => {
         <SidebarSection title="Property Basics" icon={Home}>
             <SimulationInputGroup
                 label="Home Price"
+                tooltip="Purchase price of the property."
                 value={inputs.homePrice}
                 onChange={update('homePrice')}
                 min={100000}
@@ -205,6 +211,7 @@ export const Sidebar = () => {
             />
             <SimulationInputGroup
                 label="Down Payment"
+                tooltip="Upfront cash payment as % of home price."
                 value={inputs.downPaymentPercentage}
                 onChange={update('downPaymentPercentage')}
                 min={0}
@@ -217,6 +224,7 @@ export const Sidebar = () => {
             <ExpandableSection isOpen={inputs.downPaymentPercentage < 20}>
                 <SimulationInputGroup
                     label="PMI Rate"
+                    tooltip="Annual Private Mortgage Insurance rate (required if down payment < 20%)."
                     value={inputs.pmiRate ?? 0.5}
                     onChange={update('pmiRate')}
                     min={0}
@@ -228,6 +236,7 @@ export const Sidebar = () => {
             </ExpandableSection>
              <SimulationInputGroup
                 label="Interest Rate"
+                tooltip="Annual fixed mortgage interest rate."
                 value={inputs.mortgageRate}
                 onChange={update('mortgageRate')}
                 min={2}
@@ -238,6 +247,7 @@ export const Sidebar = () => {
             />
             <SimulationInputGroup
                 label="Loan Term"
+                tooltip="Duration of the mortgage in years."
                 value={inputs.loanTermYears}
                 onChange={update('loanTermYears')}
                 min={10}
@@ -254,6 +264,7 @@ export const Sidebar = () => {
         <SidebarSection title="Savings Discipline" icon={TrendingUp}>
              <SimulationInputGroup
                 label="Renter Discipline"
+                tooltip="% of monthly savings (vs buying) that renter invests."
                 value={inputs.renterDiscipline}
                 onChange={update('renterDiscipline')}
                 min={0}
@@ -264,6 +275,7 @@ export const Sidebar = () => {
             />
              <SimulationInputGroup
                 label="Owner Discipline"
+                tooltip="% of monthly savings (vs renting) that owner invests."
                 value={inputs.ownerDiscipline}
                 onChange={update('ownerDiscipline')}
                 min={0}
@@ -280,6 +292,7 @@ export const Sidebar = () => {
         <SidebarSection title="Rental Market" icon={Building2}>
             <SimulationInputGroup
                 label="Monthly Rent"
+                tooltip="Current monthly rent for comparable property."
                 value={inputs.monthlyRent}
                 onChange={update('monthlyRent')}
                 min={500}
@@ -290,6 +303,7 @@ export const Sidebar = () => {
             />
             <SimulationInputGroup
                 label="Rent Inflation"
+                tooltip="Annual percentage increase in rent."
                 value={inputs.rentInflationRate}
                 onChange={update('rentInflationRate')}
                 min={0}
@@ -299,7 +313,8 @@ export const Sidebar = () => {
                 inputClassName="w-20"
             />
              <SimulationInputGroup
-                label="Renters Ins."
+                label="Renters Insurance"
+                tooltip="Monthly cost of renter's insurance."
                 value={inputs.rentersInsuranceMonthly}
                 onChange={update('rentersInsuranceMonthly')}
                 min={0}
@@ -316,6 +331,7 @@ export const Sidebar = () => {
         <SidebarSection title="Forecasts" icon={TrendingUp}>
             <SimulationInputGroup
                 label="Home Appreciation"
+                tooltip="Annual % increase in property value."
                 value={inputs.homeAppreciationRate}
                 onChange={update('homeAppreciationRate')}
                 min={-5}
@@ -326,6 +342,7 @@ export const Sidebar = () => {
             />
             <SimulationInputGroup
                 label="Investment Return"
+                tooltip="Expected annual return on investments."
                 value={inputs.investmentReturnRate}
                 onChange={update('investmentReturnRate')}
                 min={0}
@@ -337,6 +354,7 @@ export const Sidebar = () => {
             <div className="space-y-3">
                 <SimulationInputGroup
                     label="Inflation Rate"
+                    tooltip="General annual inflation rate."
                     value={inputs.inflationRate}
                     onChange={update('inflationRate')}
                     min={0}
@@ -353,9 +371,12 @@ export const Sidebar = () => {
                     />
                     <label
                         htmlFor="inflation-adjusted"
-                        className="text-xs text-zinc-400 cursor-pointer select-none hover:text-zinc-300 transition-colors"
+                        className="text-xs text-zinc-400 cursor-pointer select-none hover:text-zinc-300 transition-colors flex items-center gap-1.5"
                     >
                         Adjust results for inflation
+                         <Tooltip content="Discount future values to today's dollars using inflation rate.">
+                            <CircleHelp className="w-3 h-3 text-zinc-500 hover:text-zinc-300" />
+                        </Tooltip>
                     </label>
                 </div>
             </div>
@@ -363,6 +384,7 @@ export const Sidebar = () => {
             <div className="space-y-3">
                 <SimulationInputGroup
                     label="Property Tax"
+                    tooltip="Annual tax as % of assessed value."
                     value={inputs.propertyTaxRate}
                     onChange={update('propertyTaxRate')}
                     min={0}
@@ -379,14 +401,18 @@ export const Sidebar = () => {
                     />
                     <label
                         htmlFor="prop-13"
-                        className="text-xs text-zinc-400 cursor-pointer select-none hover:text-zinc-300 transition-colors"
+                        className="text-xs text-zinc-400 cursor-pointer select-none hover:text-zinc-300 transition-colors flex items-center gap-1.5"
                     >
                         Enable CA Prop 13 limits
+                        <Tooltip content="Limit assessed value growth to 2% per year (California rule).">
+                            <CircleHelp className="w-3 h-3 text-zinc-500 hover:text-zinc-300" />
+                        </Tooltip>
                     </label>
                 </div>
             </div>
              <SimulationInputGroup
                 label="Maintenance"
+                tooltip="Annual maintenance cost as % of home value."
                 value={inputs.maintenanceCostPercentage}
                 onChange={update('maintenanceCostPercentage')}
                 min={0}
