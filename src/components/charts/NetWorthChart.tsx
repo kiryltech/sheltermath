@@ -17,7 +17,6 @@ export const NetWorthChart = () => {
   const { results } = useSimulationStore();
   const { annualData } = results;
 
-  // Format currency for axis and tooltip
   const formatCurrency = (value: number) => {
     if (Math.abs(value) >= 1000000) {
       return `$${(value / 1000000).toFixed(1)}M`;
@@ -30,13 +29,22 @@ export const NetWorthChart = () => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-zinc-900 border border-zinc-700 p-2 rounded shadow-lg text-xs">
-          <p className="font-bold text-zinc-300 mb-1">Year {label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.color }}>
-              {entry.name}: {formatCurrency(entry.value)}
-            </p>
-          ))}
+        <div className="bg-surface-dark border border-white/10 p-3 rounded-lg shadow-xl backdrop-blur-md">
+          <p className="text-zinc-400 text-xs mb-2">Year {label}</p>
+          <div className="space-y-1">
+            {payload.map((entry: any, index: number) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                 <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  <span className="text-zinc-300 w-24">{entry.name}:</span>
+                  <span className="font-mono text-white">
+                    {formatCurrency(entry.value)}
+                  </span>
+              </div>
+            ))}
+          </div>
         </div>
       );
     }
@@ -44,55 +52,61 @@ export const NetWorthChart = () => {
   };
 
   return (
-    <div className="w-full h-[400px] p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
-        <h3 className="text-lg font-semibold text-zinc-200 mb-4">Net Worth Projection</h3>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={annualData}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-            <XAxis
-                dataKey="year"
-                stroke="#71717a"
-                tick={{fill: '#71717a', fontSize: 12}}
-                tickLine={false}
-                axisLine={false}
-            />
-            <YAxis
-                stroke="#71717a"
-                tick={{fill: '#71717a', fontSize: 12}}
-                tickFormatter={formatCurrency}
-                tickLine={false}
-                axisLine={false}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#52525b', strokeWidth: 1, strokeDasharray: '4 4' }} />
-            <Legend verticalAlign="top" height={36} iconType="circle" />
-            <Line
-              type="monotone"
-              dataKey="ownerNetWorth"
-              name="Buying Net Worth"
-              stroke="#f97316" // orange-500
-              strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="renterNetWorth"
-              name="Renting Net Worth"
-              stroke="#22d3ee" // cyan-400
-              strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 6 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+    <div className="bg-surface-dark border border-white/5 rounded-xl p-6 shadow-lg">
+        <div className="mb-6">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-zinc-500">trending_up</span>
+                Net Worth Projection
+            </h3>
+            <p className="text-sm text-zinc-400 mt-1">
+              Total value of assets (Home Equity + Investments) minus liabilities (Mortgage Balance) over time.
+            </p>
+        </div>
+        <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+                data={annualData}
+                margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
+            >
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis
+                    dataKey="year"
+                    stroke="#52525b"
+                    tick={{fill: '#71717a', fontSize: 12}}
+                    tickLine={false}
+                    axisLine={false}
+                    dy={10}
+                />
+                <YAxis
+                    stroke="#52525b"
+                    tick={{fill: '#71717a', fontSize: 12}}
+                    tickFormatter={formatCurrency}
+                    tickLine={false}
+                    axisLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)' }} />
+                <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                <Line
+                    type="monotone"
+                    dataKey="ownerNetWorth"
+                    name="Owner"
+                    stroke="#f97316"
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 6 }}
+                />
+                <Line
+                    type="monotone"
+                    dataKey="renterNetWorth"
+                    name="Renter"
+                    stroke="#22d3ee"
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 6 }}
+                />
+            </LineChart>
+            </ResponsiveContainer>
+        </div>
     </div>
   );
 };
