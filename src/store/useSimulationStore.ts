@@ -18,9 +18,9 @@ export const DEFAULT_INPUTS: SimulationParams = {
   homeAppreciationRate: 4.0,
   sellingCostPercentage: 6.0,
   monthlyRent: 4200,
-  rentInflationRate: 3.5,
+  rentInflationRate: 6.0,
   rentersInsuranceMonthly: 15,
-  investmentReturnRate: 7.0,
+  investmentReturnRate: 10.0,
   inflationRate: 3.0,
   simulationYears: 45, // Updated default to 45
   renterDiscipline: 50, // Default 50%
