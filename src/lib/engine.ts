@@ -106,6 +106,15 @@ export function calculateMonthlyPayments(principal: number, annualRate: number, 
   );
 }
 
+/**
+ * Calculates the monthly geometric rate from an annual rate.
+ * Formula: (1 + annualRate)^(1/12) - 1
+ */
+export function calculateMonthlyGeometricRate(annualRate: number): number {
+    if (annualRate === 0) return 0;
+    return Math.pow(1 + annualRate / 100, 1 / 12) - 1;
+}
+
 interface OwnerMonthlyState {
     mortgagePayment: number;
     propertyTax: number;
@@ -139,7 +148,9 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
         homePrice
     } = params;
 
-    const monthlyAppreciationRate = homeAppreciationRate / 100 / 12;
+    // Use Geometric compounding for appreciation (Effective Annual Rate)
+    const monthlyAppreciationRate = calculateMonthlyGeometricRate(homeAppreciationRate);
+    // Use Arithmetic (APR) for Mortgage
     const monthlyRate = mortgageRate / 100 / 12;
 
     let currentHomeValue = homePrice;
@@ -251,7 +262,9 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
   const downPayment = homePrice * (downPaymentPercentage / 100);
   const loanPrincipal = homePrice - downPayment;
   const monthlyMortgagePI = calculateMonthlyPayments(loanPrincipal, mortgageRate, loanTermYears);
-  const monthlyInvestmentReturn = investmentReturnRate / 100 / 12;
+
+  // Use Geometric compounding for Investment Return (Effective Annual Rate)
+  const monthlyInvestmentReturn = calculateMonthlyGeometricRate(investmentReturnRate);
 
   // Generate Schedules
   const ownerSchedule = calculateOwnerSchedule(params, monthlyMortgagePI, loanPrincipal);
