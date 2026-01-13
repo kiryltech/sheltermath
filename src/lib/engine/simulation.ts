@@ -82,6 +82,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
           renterContribution: result.renterContribution,
           ownerPortfolioGrowth: result.ownerPortfolioGrowth,
           renterPortfolioGrowth: result.renterPortfolioGrowth,
+          taxSavings: result.taxSavings,
           discountFactor: result.discountFactor
       });
 
@@ -114,8 +115,9 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
           crossoverDate = { year, totalMonths: month };
       }
 
-      // Check raw outflows for crossover
-      if (!monthlyPaymentCrossoverDate && owner.totalOutflow <= renter.totalOutflow) {
+      // Check adjusted outflows for monthly payment crossover
+      const { totalOwnerOutflow: discountedOwnerOutflow, totalRenterOutflow: discountedRenterOutflow } = result.monthlyData;
+      if (!monthlyPaymentCrossoverDate && discountedOwnerOutflow <= discountedRenterOutflow) {
           monthlyPaymentCrossoverDate = { year, totalMonths: month };
       }
   }

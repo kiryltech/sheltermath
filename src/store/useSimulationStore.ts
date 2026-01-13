@@ -36,6 +36,7 @@ export const DEFAULT_INPUTS: SimulationParams = {
   federalTaxRate: 22.0,
   stateTaxRate: 10.0,
   incomeGrowthRate: 3.0,
+  itemizedDeductionRate: 0, // Default to standard deduction (0% itemized benefit assumed initially)
 };
 
 export const useSimulationStore = create<SimulationState>((set) => ({

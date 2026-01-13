@@ -199,6 +199,17 @@ export const Sidebar = () => {
                 suffix="%"
                 inputClassName="w-20"
             />
+            <SimulationInputGroup
+                label="Itemized Deduction"
+                value={inputs.itemizedDeductionRate ?? 0}
+                onChange={update('itemizedDeductionRate')}
+                min={0}
+                max={100}
+                step={25}
+                suffix="%"
+                helperText={inputs.itemizedDeductionRate === 0 ? "Standard" : inputs.itemizedDeductionRate === 100 ? "Full" : "Partial"}
+                inputClassName="w-20"
+            />
         </SidebarSection>
 
         <hr className="border-white/5" />

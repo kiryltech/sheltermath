@@ -38,7 +38,7 @@ export const AnnualBreakdownCharts = () => {
         ));
 
         const inflows = payload.filter((p: any) => p.dataKey && p.value > 0 && (
-             p.name.includes('(In)') || ['Home Appreciation', 'Portfolio Growth'].includes(p.name)
+             p.name.includes('(In)') || ['Home Appreciation', 'Portfolio Growth', 'Tax Savings'].includes(p.name)
         ));
 
         const totalOutflow = outflows.reduce((acc: number, curr: any) => acc + curr.value, 0);
@@ -145,6 +145,7 @@ export const AnnualBreakdownCharts = () => {
                 <Bar dataKey="ownerPortfolioContribution" stackId="out" name="Portfolio Contrib (Out)" fill="#6366f1" stroke="none" isAnimationActive={false} />
 
                 {/* Stack 2: Inflows */}
+                <Bar dataKey="ownerTaxSavings" stackId="in" name="Tax Savings" fill="#22c55e" stroke="none" isAnimationActive={false} />
                 <Bar dataKey="ownerPrincipalPaid" stackId="in" name="Principal Paid (In)" fill="#3b82f6" stroke="none" legendType="none" isAnimationActive={false} />
                 <Bar dataKey="ownerPortfolioContribution" stackId="in" name="Portfolio Contrib (In)" fill="#6366f1" stroke="none" legendType="none" isAnimationActive={false} />
                 <Bar dataKey="ownerHomeAppreciation" stackId="in" name="Home Appreciation" fill="#10b981" stroke="none" isAnimationActive={false} />

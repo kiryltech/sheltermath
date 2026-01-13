@@ -27,6 +27,7 @@ export interface SimulationParams {
   federalTaxRate: number;
   stateTaxRate: number;
   incomeGrowthRate?: number; // Defaults to inflationRate if not provided
+  itemizedDeductionRate?: number; // 0 to 100% of potential deductions claimed (default 0)
 
   // Simulation
   simulationYears: number;
@@ -73,6 +74,7 @@ export interface AnnualFlows {
   ownerInsurance: number;
   ownerMaintenance: number;
   ownerPMI: number; // New field for PMI
+  ownerTaxSavings: number; // Deductible tax savings
   ownerHomeAppreciation: number;
   ownerPortfolioContribution: number;
   ownerPortfolioGrowth: number;

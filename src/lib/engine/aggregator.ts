@@ -13,6 +13,7 @@ export function initializeYearFlows(year: number, initialValues?: Partial<Annual
         ownerInsurance: 0,
         ownerMaintenance: 0,
         ownerPMI: 0,
+        ownerTaxSavings: 0,
         ownerHomeAppreciation: 0,
         ownerPortfolioContribution: 0,
         ownerPortfolioGrowth: 0,
@@ -29,6 +30,7 @@ export interface AccumulationInput {
     renterContribution: number;
     ownerPortfolioGrowth: number;
     renterPortfolioGrowth: number;
+    taxSavings: number; // Already discounted from monthly-logic
     discountFactor: number;
 }
 
@@ -42,6 +44,7 @@ export function accumulateAnnualFlows(input: AccumulationInput): AnnualFlows {
         renterContribution,
         ownerPortfolioGrowth,
         renterPortfolioGrowth,
+        taxSavings,
         discountFactor
     } = input;
 
@@ -63,6 +66,7 @@ export function accumulateAnnualFlows(input: AccumulationInput): AnnualFlows {
         ownerInsurance: currentFlows.ownerInsurance + (owner.homeInsurance * discountFactor),
         ownerMaintenance: currentFlows.ownerMaintenance + (owner.maintenanceCost * discountFactor),
         ownerPMI: currentFlows.ownerPMI + (owner.pmiPayment * discountFactor),
+        ownerTaxSavings: currentFlows.ownerTaxSavings + taxSavings,
         ownerHomeAppreciation: currentFlows.ownerHomeAppreciation + (owner.monthlyAppreciation * discountFactor),
         ownerPortfolioContribution: currentFlows.ownerPortfolioContribution + (ownerContribution * discountFactor),
         ownerPortfolioGrowth: currentFlows.ownerPortfolioGrowth + (ownerPortfolioGrowth * discountFactor)
