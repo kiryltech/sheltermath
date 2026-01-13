@@ -48,7 +48,7 @@ describe('simulateTimeline', () => {
     // Just verify it's not null for a reasonable scenario
     if (result.crossoverDate) {
        expect(result.crossoverDate.year).toBeGreaterThan(0);
-       expect(result.crossoverDate.month).toBeGreaterThan(0);
+       expect(result.crossoverDate.totalMonths).toBeGreaterThan(0);
     }
   });
 
