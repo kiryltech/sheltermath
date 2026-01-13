@@ -282,13 +282,14 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
   let totalInterestPaid = 0;
 
   // Track aggregations for the current year
+  // Initialize Year 1 with Down Payment flows
   let currentYearFlows: AnnualFlows = {
       year: 1,
       renterRent: 0,
       renterInsurance: 0,
-      renterPortfolioContribution: 0,
+      renterPortfolioContribution: downPayment, // Initial Investment
       renterPortfolioGrowth: 0,
-      ownerPrincipalPaid: 0,
+      ownerPrincipalPaid: downPayment, // Initial Equity Purchase
       ownerInterestPaid: 0,
       ownerTax: 0,
       ownerInsurance: 0,
