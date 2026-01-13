@@ -27,6 +27,7 @@ export const DEFAULT_INPUTS: SimulationParams = {
   renterDiscipline: 0,
   ownerDiscipline: 0,
   pmiRate: 0.5, // Default PMI rate 0.5%
+  isProp13: false,
 };
 
 export const useSimulationStore = create<SimulationState>((set) => ({

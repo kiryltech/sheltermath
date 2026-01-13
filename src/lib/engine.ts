@@ -12,6 +12,7 @@ export interface SimulationParams {
   homeAppreciationRate: number; // Annual percentage
   sellingCostPercentage: number; // Cost to sell home (e.g. 6%)
   pmiRate?: number; // Annual percentage of loan amount (e.g. 0.5%)
+  isProp13?: boolean; // Use CA Prop 13 tax calculation (2% max growth on assessed value)
 
   // Rental
   monthlyRent: number;
@@ -150,7 +151,8 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
         mortgageRate,
         simulationYears,
         homePrice,
-        pmiRate = 0 // Default to 0 if not provided
+        pmiRate = 0, // Default to 0 if not provided
+        isProp13 = false
     } = params;
 
     // Use Geometric compounding for appreciation (Effective Annual Rate)
@@ -160,13 +162,19 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
     // Calculate Monthly PMI Amount (based on original loan amount)
     const monthlyPMI = (loanPrincipal * (pmiRate / 100)) / 12;
 
+    // Prop 13: Assessed value grows by max 2% annually.
+    const monthlyAssessedRate = calculateMonthlyGeometricRate(2.0);
+
     let currentHomeValue = homePrice;
+    let assessedValue = homePrice;
     let remainingPrincipal = loanPrincipal;
     const schedule: OwnerMonthlyState[] = [];
 
     for (let month = 1; month <= simulationYears * 12; month++) {
-        // Costs based on current home value
-        const monthlyPropertyTax = (currentHomeValue * (propertyTaxRate / 100)) / 12;
+        // Costs based on current home value (except tax if Prop 13)
+        const taxBaseValue = isProp13 ? assessedValue : currentHomeValue;
+        const monthlyPropertyTax = (taxBaseValue * (propertyTaxRate / 100)) / 12;
+
         const monthlyMaintenance = (currentHomeValue * (maintenanceCostPercentage / 100)) / 12;
         const monthlyHomeInsurance = (currentHomeValue * (homeInsuranceRate / 100)) / 12;
 
@@ -210,6 +218,10 @@ function calculateOwnerSchedule(params: SimulationParams, monthlyMortgagePI: num
         const previousHomeValue = currentHomeValue;
         currentHomeValue *= (1 + monthlyAppreciationRate);
         const monthlyAppreciation = currentHomeValue - previousHomeValue;
+
+        if (isProp13) {
+            assessedValue *= (1 + monthlyAssessedRate);
+        }
 
         schedule.push({
             mortgagePayment: currentMortgagePayment,
