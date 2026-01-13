@@ -22,7 +22,9 @@ export const DEFAULT_INPUTS: SimulationParams = {
   rentersInsuranceMonthly: 15,
   investmentReturnRate: 7.0,
   inflationRate: 3.0,
-  simulationYears: 30,
+  simulationYears: 45, // Updated default to 45
+  renterDiscipline: 100, // Default 100%
+  ownerDiscipline: 100, // Default 100%
 };
 
 export const useSimulationStore = create<SimulationState>((set) => ({
