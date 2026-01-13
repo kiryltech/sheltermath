@@ -29,6 +29,11 @@ export const DEFAULT_INPUTS: SimulationParams = {
   pmiRate: 0.5, // Default PMI rate 0.5%
   isProp13: false,
   inflationAdjusted: false,
+  // Household Income
+  grossIncome: 200000,
+  federalTaxRate: 22.0,
+  stateTaxRate: 10.0,
+  incomeGrowthRate: 3.0,
 };
 
 export const useSimulationStore = create<SimulationState>((set) => ({

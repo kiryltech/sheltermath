@@ -5,6 +5,8 @@ import { Sidebar } from '@/components/Sidebar';
 import { NetWorthChart } from '@/components/charts/NetWorthChart';
 import { CashFlowChart } from '@/components/charts/CashFlowChart';
 import { AnnualBreakdownCharts } from '@/components/charts/AnnualBreakdownCharts';
+import { HousingIncomeRatioChart } from '@/components/charts/HousingIncomeRatioChart';
+import { LifestyleBudgetChart } from '@/components/charts/LifestyleBudgetChart';
 import { SummaryMetrics } from '@/components/SummaryMetrics';
 import { Modal } from '@/components/ui/Modal';
 import { BarChart3 } from 'lucide-react';
@@ -23,6 +25,11 @@ export default function Home() {
             </header>
 
             <SummaryMetrics />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <HousingIncomeRatioChart />
+                <LifestyleBudgetChart />
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <NetWorthChart />

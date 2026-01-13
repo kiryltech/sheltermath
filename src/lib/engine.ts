@@ -23,6 +23,12 @@ export interface SimulationParams {
   investmentReturnRate: number; // Annual percentage (e.g., 7 for 7%)
   inflationRate: number; // Annual percentage (general inflation)
 
+  // Income
+  grossIncome: number;
+  federalTaxRate: number;
+  stateTaxRate: number;
+  incomeGrowthRate?: number; // Defaults to inflationRate if not provided
+
   // Simulation
   simulationYears: number;
   inflationAdjusted?: boolean;
@@ -75,6 +81,14 @@ export interface MonthlyCashFlow {
   investedAmount: number; // The amount added to investment pool this month (after discipline).
   ownerNetWorth: number;
   renterNetWorth: number;
+
+  // Income & Ratios
+  grossIncome: number;
+  netIncome: number;
+  lifestyleBudgetRenter: number;
+  lifestyleBudgetOwner: number;
+  housingIncomeRatioOwner: number;
+  housingIncomeRatioRenter: number;
 }
 
 export interface AnnualSnapshot {
@@ -287,8 +301,15 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
     renterDiscipline = 100, // Default to 100 if undefined (though interface requires it)
     ownerDiscipline = 100,
     inflationAdjusted = false,
+    grossIncome,
+    federalTaxRate,
+    stateTaxRate,
+    incomeGrowthRate,
     inflationRate
   } = params;
+
+  // Defaults
+  const actualIncomeGrowthRate = incomeGrowthRate ?? inflationRate;
 
   // Initial calculations
   const downPayment = homePrice * (downPaymentPercentage / 100);
@@ -297,6 +318,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
 
   // Use Geometric compounding for Investment Return (Effective Annual Rate)
   const monthlyInvestmentReturn = calculateMonthlyGeometricRate(investmentReturnRate);
+  const monthlyIncomeGrowth = calculateMonthlyGeometricRate(actualIncomeGrowthRate);
 
   // Calculate discount rate if inflation adjustment is enabled
   const monthlyDiscountRate = inflationAdjusted ? calculateMonthlyGeometricRate(inflationRate) : 0;
@@ -306,6 +328,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
   const renterSchedule = calculateRenterSchedule(params);
 
   // Calculate Investments and Net Worth
+  let currentGrossIncome = grossIncome;
   let ownerInvestmentPortfolio = 0;
   // Renter invests the down payment
   let renterInvestmentPortfolio = downPayment;
@@ -407,6 +430,16 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       const ownerNetWorth = owner.realizableEquity + ownerInvestmentPortfolio;
       const renterNetWorth = renterInvestmentPortfolio;
 
+      // Income & Budget Calculations
+      const monthlyTax = currentGrossIncome * ((federalTaxRate + stateTaxRate) / 100) / 12;
+      const monthlyNetIncome = (currentGrossIncome / 12) - monthlyTax;
+
+      const lifestyleBudgetOwner = monthlyNetIncome - owner.totalOutflow;
+      const lifestyleBudgetRenter = monthlyNetIncome - renter.totalOutflow;
+
+      const housingIncomeRatioOwner = (owner.totalOutflow / (currentGrossIncome / 12)) * 100;
+      const housingIncomeRatioRenter = (renter.totalOutflow / (currentGrossIncome / 12)) * 100;
+
       // Accumulate Annual Flows (Apply Discount Factor)
       currentYearFlows.renterRent += renter.rentPayment * discountFactor;
       currentYearFlows.renterInsurance += renter.rentersInsurance * discountFactor;
@@ -440,8 +473,17 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
           savings: Math.abs(diff) * discountFactor,
           investedAmount: investedAmount * discountFactor,
           ownerNetWorth: ownerNetWorth * discountFactor,
-          renterNetWorth: renterNetWorth * discountFactor
+          renterNetWorth: renterNetWorth * discountFactor,
+          grossIncome: (currentGrossIncome / 12) * discountFactor,
+          netIncome: monthlyNetIncome * discountFactor,
+          lifestyleBudgetRenter: lifestyleBudgetRenter * discountFactor,
+          lifestyleBudgetOwner: lifestyleBudgetOwner * discountFactor,
+          housingIncomeRatioOwner,
+          housingIncomeRatioRenter
       });
+
+      // Grow Income
+      currentGrossIncome *= (1 + monthlyIncomeGrowth);
 
       if (!crossoverDate && ownerNetWorth > renterNetWorth) {
           crossoverDate = { year, totalMonths: month };
