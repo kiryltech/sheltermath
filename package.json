@@ -1,6 +1,6 @@
 {
-  "name": "temp_app",
-  "version": "0.1.0",
+  "name": "sheltermath",
+  "version": "0.7.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
