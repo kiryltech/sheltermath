@@ -434,8 +434,8 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       const monthlyTax = currentGrossIncome * ((federalTaxRate + stateTaxRate) / 100) / 12;
       const monthlyNetIncome = (currentGrossIncome / 12) - monthlyTax;
 
-      const lifestyleBudgetOwner = monthlyNetIncome - owner.totalOutflow;
-      const lifestyleBudgetRenter = monthlyNetIncome - renter.totalOutflow;
+      const lifestyleBudgetOwner = monthlyNetIncome - owner.totalOutflow - ownerContribution;
+      const lifestyleBudgetRenter = monthlyNetIncome - renter.totalOutflow - renterContribution;
 
       const housingIncomeRatioOwner = (owner.totalOutflow / (currentGrossIncome / 12)) * 100;
       const housingIncomeRatioRenter = (renter.totalOutflow / (currentGrossIncome / 12)) * 100;
