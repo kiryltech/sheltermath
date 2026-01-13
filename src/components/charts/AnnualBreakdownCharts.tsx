@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -9,7 +9,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  Legend,
+  ReferenceLine
 } from 'recharts';
 import { useSimulationStore } from '@/store/useSimulationStore';
 
@@ -17,29 +18,83 @@ export const AnnualBreakdownCharts = () => {
   const { results } = useSimulationStore();
   const { annualFlows } = results;
 
+  const chartData = useMemo(() => {
+    return annualFlows.map(flow => ({
+        ...flow,
+        // Negative Flows (Expenses & Outflows)
+        renterRentNeg: -flow.renterRent,
+        renterInsuranceNeg: -flow.renterInsurance,
+        renterPortfolioContributionNeg: -flow.renterPortfolioContribution,
+
+        ownerInterestNeg: -flow.ownerInterestPaid,
+        ownerTaxNeg: -flow.ownerTax,
+        ownerMaintenanceNeg: -flow.ownerMaintenance,
+        ownerInsuranceNeg: -flow.ownerInsurance,
+        ownerPrincipalNeg: -flow.ownerPrincipalPaid,
+        ownerPortfolioContributionNeg: -flow.ownerPortfolioContribution,
+
+        // Positive Flows (Inflows & Growth)
+        // We reuse the existing keys for positive values as they are already positive in annualFlows
+        // but explicit mapping for clarity if needed.
+        // Actually, existing keys are perfect for positive stack.
+    }));
+  }, [annualFlows]);
+
   const formatCurrency = (value: number) => {
-    if (Math.abs(value) >= 1000) {
-        return `$${(value / 1000).toFixed(0)}k`;
+    const absValue = Math.abs(value);
+    if (absValue >= 1000) {
+        return `${value < 0 ? '-' : ''}$${(absValue / 1000).toFixed(0)}k`;
     }
-    return `$${value.toFixed(0)}`;
+    return `${value < 0 ? '-' : ''}$${absValue.toFixed(0)}`;
   };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+        // Separate positive and negative items
+        const income = payload.filter((p: any) => p.value > 0);
+        const expenses = payload.filter((p: any) => p.value < 0);
+
+        // Calculate Net
+        const total = payload.reduce((acc: number, curr: any) => acc + curr.value, 0);
+
       return (
-        <div className="bg-zinc-900 border border-zinc-700 p-2 rounded shadow-lg text-xs">
-          <p className="font-bold text-zinc-300 mb-1">Year {label}</p>
-          {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex items-center gap-2">
-                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                 <span className="text-zinc-400">{entry.name}:</span>
-                 <span className="text-zinc-200 font-mono">{formatCurrency(entry.value)}</span>
-            </div>
-          ))}
-          <div className="mt-2 pt-2 border-t border-zinc-800">
-             <span className="text-zinc-400">Total: </span>
-             <span className="text-zinc-200 font-mono">
-                 {formatCurrency(payload.reduce((acc: number, curr: any) => acc + curr.value, 0))}
+        <div className="bg-zinc-900 border border-zinc-700 p-2 rounded shadow-lg text-xs min-w-[200px]">
+          <p className="font-bold text-zinc-300 mb-2">Year {label}</p>
+
+          {income.length > 0 && (
+              <div className="mb-2">
+                  <p className="text-zinc-500 font-semibold mb-1 uppercase text-[10px]">Asset Growth & Inflow</p>
+                  {income.map((entry: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between gap-4 mb-0.5">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                            <span className="text-zinc-400">{entry.name}</span>
+                        </div>
+                        <span className="text-zinc-200 font-mono">{formatCurrency(entry.value)}</span>
+                    </div>
+                  ))}
+              </div>
+          )}
+
+          {expenses.length > 0 && (
+              <div className="mb-2">
+                  <p className="text-zinc-500 font-semibold mb-1 uppercase text-[10px]">Expenses & Outflow</p>
+                  {expenses.map((entry: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between gap-4 mb-0.5">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                            <span className="text-zinc-400">{entry.name}</span>
+                        </div>
+                        <span className="text-zinc-200 font-mono">{formatCurrency(entry.value)}</span>
+                    </div>
+                  ))}
+              </div>
+          )}
+
+          <div className="mt-2 pt-2 border-t border-zinc-800 flex justify-between">
+             <span className="text-zinc-400 font-semibold">Net Flow: </span>
+             <span className={`font-mono ${total >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                 {formatCurrency(total)}
              </span>
           </div>
         </div>
@@ -55,13 +110,14 @@ export const AnnualBreakdownCharts = () => {
             <h3 className="text-lg font-semibold text-zinc-200 mb-4">Renter Annual Breakdown</h3>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={annualFlows}
+                data={chartData}
                 margin={{
                   top: 20,
                   right: 30,
                   left: 20,
                   bottom: 5,
                 }}
+                stackOffset="sign"
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                 <XAxis
@@ -80,11 +136,16 @@ export const AnnualBreakdownCharts = () => {
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#3f3f46', opacity: 0.2 }} />
                 <Legend verticalAlign="top" height={36} iconType="circle" />
+                <ReferenceLine y={0} stroke="#52525b" />
 
-                <Bar dataKey="renterRent" stackId="a" name="Rent" fill="#22d3ee" />
-                <Bar dataKey="renterInsurance" stackId="a" name="Insurance" fill="#06b6d4" />
-                <Bar dataKey="renterPortfolioContribution" stackId="a" name="Portfolio Contribution" fill="#3b82f6" />
+                {/* Positive Stack */}
+                <Bar dataKey="renterPortfolioContribution" stackId="a" name="Portfolio Contribution (In)" fill="#3b82f6" />
                 <Bar dataKey="renterPortfolioGrowth" stackId="a" name="Portfolio Growth" fill="#10b981" />
+
+                {/* Negative Stack */}
+                <Bar dataKey="renterRentNeg" stackId="a" name="Rent" fill="#ef4444" />
+                <Bar dataKey="renterInsuranceNeg" stackId="a" name="Insurance" fill="#f97316" />
+                <Bar dataKey="renterPortfolioContributionNeg" stackId="a" name="Portfolio Contribution (Out)" fill="#60a5fa" />
               </BarChart>
             </ResponsiveContainer>
         </div>
@@ -94,13 +155,14 @@ export const AnnualBreakdownCharts = () => {
             <h3 className="text-lg font-semibold text-zinc-200 mb-4">Owner Annual Breakdown</h3>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={annualFlows}
+                data={chartData}
                 margin={{
                   top: 20,
                   right: 30,
                   left: 20,
                   bottom: 5,
                 }}
+                stackOffset="sign"
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                 <XAxis
@@ -119,18 +181,21 @@ export const AnnualBreakdownCharts = () => {
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#3f3f46', opacity: 0.2 }} />
                 <Legend verticalAlign="top" height={36} iconType="circle" />
+                <ReferenceLine y={0} stroke="#52525b" />
 
-                {/* Expenses */}
-                <Bar dataKey="ownerInterestPaid" stackId="a" name="Mortgage Interest" fill="#ef4444" />
-                <Bar dataKey="ownerTax" stackId="a" name="Property Tax" fill="#f59e0b" />
-                <Bar dataKey="ownerMaintenance" stackId="a" name="Maintenance" fill="#eab308" />
-                <Bar dataKey="ownerInsurance" stackId="a" name="Home Insurance" fill="#f97316" />
-
-                {/* Wealth Accumulation */}
-                <Bar dataKey="ownerPrincipalPaid" stackId="a" name="Principal Paid" fill="#8b5cf6" />
-                <Bar dataKey="ownerPortfolioContribution" stackId="a" name="Portfolio Contribution" fill="#3b82f6" />
-                <Bar dataKey="ownerPortfolioGrowth" stackId="a" name="Portfolio Growth" fill="#06b6d4" />
+                {/* Positive Stack */}
+                <Bar dataKey="ownerPrincipalPaid" stackId="a" name="Principal Paid (In)" fill="#8b5cf6" />
+                <Bar dataKey="ownerPortfolioContribution" stackId="a" name="Portfolio Contribution (In)" fill="#3b82f6" />
                 <Bar dataKey="ownerHomeAppreciation" stackId="a" name="Home Appreciation" fill="#10b981" />
+                <Bar dataKey="ownerPortfolioGrowth" stackId="a" name="Portfolio Growth" fill="#06b6d4" />
+
+                {/* Negative Stack */}
+                <Bar dataKey="ownerInterestNeg" stackId="a" name="Mortgage Interest" fill="#ef4444" />
+                <Bar dataKey="ownerTaxNeg" stackId="a" name="Property Tax" fill="#f59e0b" />
+                <Bar dataKey="ownerMaintenanceNeg" stackId="a" name="Maintenance" fill="#eab308" />
+                <Bar dataKey="ownerInsuranceNeg" stackId="a" name="Home Insurance" fill="#f97316" />
+                <Bar dataKey="ownerPrincipalNeg" stackId="a" name="Principal Paid (Out)" fill="#a78bfa" />
+                <Bar dataKey="ownerPortfolioContributionNeg" stackId="a" name="Portfolio Contribution (Out)" fill="#60a5fa" />
 
               </BarChart>
             </ResponsiveContainer>
