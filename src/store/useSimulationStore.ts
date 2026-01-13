@@ -9,7 +9,8 @@ interface SimulationState {
 
 export const DEFAULT_INPUTS: SimulationParams = {
   homePrice: 850000,
-  downPaymentPercentage: 20,
+  // Who can afford 20% down payment?
+  downPaymentPercentage: 5,
   mortgageRate: 6.875,
   loanTermYears: 30,
   propertyTaxRate: 1.2,
@@ -18,8 +19,9 @@ export const DEFAULT_INPUTS: SimulationParams = {
   homeAppreciationRate: 4.0,
   sellingCostPercentage: 6.0,
   monthlyRent: 4200,
-  rentInflationRate: 6.0,
+  rentInflationRate: 4.5,
   rentersInsuranceMonthly: 0,
+  // S&P 500 historical average
   investmentReturnRate: 10.0,
   inflationRate: 3.0,
   simulationYears: 35,
