@@ -19,7 +19,7 @@ export const DEFAULT_INPUTS: SimulationParams = {
   sellingCostPercentage: 6.0,
   monthlyRent: 4200,
   rentInflationRate: 6.0,
-  rentersInsuranceMonthly: 15,
+  rentersInsuranceMonthly: 0,
   investmentReturnRate: 10.0,
   inflationRate: 3.0,
   simulationYears: 35,
@@ -28,6 +28,7 @@ export const DEFAULT_INPUTS: SimulationParams = {
   ownerDiscipline: 0,
   pmiRate: 0.5, // Default PMI rate 0.5%
   isProp13: false,
+  inflationAdjusted: false,
 };
 
 export const useSimulationStore = create<SimulationState>((set) => ({

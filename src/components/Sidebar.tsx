@@ -287,16 +287,37 @@ export const Sidebar = () => {
                 suffix="%"
                 inputClassName="w-20"
             />
-            <SimulationInputGroup
-                label="Inflation Rate"
-                value={inputs.inflationRate}
-                onChange={update('inflationRate')}
-                min={0}
-                max={15}
-                step={0.1}
-                suffix="%"
-                inputClassName="w-20"
-            />
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <div className="flex items-center gap-2">
+                   <label className="text-sm font-medium text-zinc-300">Inflation Rate</label>
+                   <label className="flex items-center gap-1.5 cursor-pointer group">
+                      <div className="relative flex items-center">
+                          <input
+                              type="checkbox"
+                              checked={inputs.inflationAdjusted ?? false}
+                              onChange={(e) => setInputs({ inflationAdjusted: e.target.checked })}
+                              className="peer h-3.5 w-3.5 appearance-none rounded border border-zinc-600 bg-zinc-900/50 checked:bg-primary checked:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                          />
+                          <svg className="absolute w-2.5 h-2.5 text-white left-0.5 opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" viewBox="0 0 14 14" fill="none">
+                              <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                      </div>
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400 transition-colors select-none">Adjusted</span>
+                   </label>
+                </div>
+              </div>
+              <SimulationInputGroup
+                  label=""
+                  value={inputs.inflationRate}
+                  onChange={update('inflationRate')}
+                  min={0}
+                  max={15}
+                  step={0.1}
+                  suffix="%"
+                  inputClassName="w-20"
+              />
+            </div>
              <SimulationInputGroup
                 label={
                     <div className="flex items-center gap-2">
