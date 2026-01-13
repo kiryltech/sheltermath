@@ -4,7 +4,7 @@ import { Slider } from './ui/Slider';
 import { cn } from '@/lib/utils';
 
 interface SimulationInputGroupProps {
-  label: string;
+  label: React.ReactNode;
   value: number;
   onChange: (value: number) => void;
   min: number;
@@ -31,7 +31,7 @@ export const SimulationInputGroup: React.FC<SimulationInputGroupProps> = ({
   return (
     <div className="group">
       <div className="flex justify-between items-center mb-2">
-        <label className="text-sm font-medium text-zinc-300">{label}</label>
+        <div className="text-sm font-medium text-zinc-300 flex items-center gap-2">{label}</div>
         <div className="flex items-center gap-2">
           {helperText && (
             <span className="text-xs text-zinc-500 font-mono tabular-nums">

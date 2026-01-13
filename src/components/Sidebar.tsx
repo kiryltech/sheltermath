@@ -319,7 +319,20 @@ export const Sidebar = () => {
               />
             </div>
              <SimulationInputGroup
-                label="Property Tax"
+                label={
+                    <div className="flex items-center gap-2">
+                        Property Tax
+                        <label className="flex items-center gap-1 text-[10px] text-zinc-500 cursor-pointer select-none hover:text-zinc-300 transition-colors">
+                            <input
+                                type="checkbox"
+                                checked={inputs.isProp13 ?? false}
+                                onChange={(e) => setInputs({ isProp13: e.target.checked })}
+                                className="rounded border-zinc-700 bg-zinc-800 text-primary focus:ring-primary/50 w-3 h-3"
+                            />
+                            CA Prop 13
+                        </label>
+                    </div>
+                }
                 value={inputs.propertyTaxRate}
                 onChange={update('propertyTaxRate')}
                 min={0}
