@@ -29,6 +29,7 @@ export const AnnualBreakdownCharts = () => {
         ownerTaxNeg: -flow.ownerTax,
         ownerMaintenanceNeg: -flow.ownerMaintenance,
         ownerInsuranceNeg: -flow.ownerInsurance,
+        ownerPMINeg: -flow.ownerPMI,
         ownerPrincipalNeg: -flow.ownerPrincipalPaid,
         ownerPortfolioContributionNeg: -flow.ownerPortfolioContribution,
     }));
@@ -188,6 +189,7 @@ export const AnnualBreakdownCharts = () => {
                 <Bar dataKey="ownerTaxNeg" stackId="a" name="Property Tax" fill="#f59e0b" stroke="none" />
                 <Bar dataKey="ownerMaintenanceNeg" stackId="a" name="Maintenance" fill="#eab308" stroke="none" />
                 <Bar dataKey="ownerInsuranceNeg" stackId="a" name="Home Insurance" fill="#f97316" stroke="none" />
+                <Bar dataKey="ownerPMINeg" stackId="a" name="PMI" fill="#d946ef" stroke="none" />
                 <Bar dataKey="ownerPrincipalNeg" stackId="a" name="Principal Paid (Out)" fill="#a78bfa" stroke="none" />
                 <Bar dataKey="ownerPortfolioContributionNeg" stackId="a" name="Portfolio Contribution (Out)" fill="#60a5fa" stroke="none" />
 
