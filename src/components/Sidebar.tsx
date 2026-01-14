@@ -275,6 +275,17 @@ export const Sidebar = () => {
                 suffix="Yr"
                 inputClassName="w-20"
             />
+            <SimulationInputGroup
+                label="Maintenance"
+                tooltip="Annual maintenance cost as % of home value."
+                value={inputs.maintenanceCostPercentage}
+                onChange={update('maintenanceCostPercentage')}
+                min={0}
+                max={5}
+                step={0.1}
+                suffix="%"
+                inputClassName="w-20"
+            />
         </SidebarSection>
 
         <hr className="border-white/5" />
@@ -429,17 +440,6 @@ export const Sidebar = () => {
                     </label>
                 </div>
             </div>
-             <SimulationInputGroup
-                label="Maintenance"
-                tooltip="Annual maintenance cost as % of home value."
-                value={inputs.maintenanceCostPercentage}
-                onChange={update('maintenanceCostPercentage')}
-                min={0}
-                max={5}
-                step={0.1}
-                suffix="%"
-                inputClassName="w-20"
-            />
         </SidebarSection>
 
       </div>
