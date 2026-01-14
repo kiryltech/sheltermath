@@ -24,6 +24,11 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
   let ownerInvestmentPortfolio = 0;
   let renterInvestmentPortfolio = downPayment; // Renter invests the down payment
 
+  // Track Renter Portfolio Components separately for detailed stats
+  let renterInitialPortfolio = downPayment; // Tracks growth of initial down payment
+  let renterContinuousPortfolio = 0; // Tracks growth of monthly savings
+  let renterTotalContinuousContributionPV = 0; // Tracks total amount contributed (PV adjusted)
+
   const monthlyData: MonthlyCashFlow[] = [];
   const annualData: AnnualSnapshot[] = [];
   const annualFlows: AnnualFlows[] = [];
@@ -70,6 +75,16 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
       // Update State
       ownerInvestmentPortfolio = result.newOwnerPortfolio;
       renterInvestmentPortfolio = result.newRenterPortfolio;
+
+      // Update separate renter components
+      // 1. Grow Initial Portfolio
+      renterInitialPortfolio *= (1 + monthlyInvestmentReturn);
+      // 2. Grow and Contribute to Continuous Portfolio
+      renterContinuousPortfolio += result.renterContribution;
+      renterContinuousPortfolio *= (1 + monthlyInvestmentReturn);
+      // 3. Track Total Contribution (PV)
+      renterTotalContinuousContributionPV += result.renterContribution * result.discountFactor;
+
       monthlyData.push(result.monthlyData);
 
       // Accumulate Flows
@@ -141,6 +156,17 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
     }
   }
 
+  // Calculate detailed renter metrics
+  const lastMonthData = monthlyData.length > 0 ? monthlyData[monthlyData.length - 1] : null;
+  const finalDF = params.inflationAdjusted ? (1 / Math.pow(1 + monthlyDiscountRate, monthlyData.length)) : 1;
+
+  const renterTotalInitialContribution = downPayment; // At T=0, PV = Nominal
+  const finalInitialPortfolioPV = renterInitialPortfolio * finalDF;
+  const renterTotalInitialYield = finalInitialPortfolioPV - renterTotalInitialContribution;
+
+  const finalContinuousPortfolioPV = renterContinuousPortfolio * finalDF;
+  const renterTotalContinuousYield = finalContinuousPortfolioPV - renterTotalContinuousContributionPV;
+
   return {
     monthlyData,
     annualData,
@@ -149,8 +175,12 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
     monthlyPaymentCrossoverDate,
     summary: {
       totalInterestPaid,
-      finalOwnerNetWorth: monthlyData[monthlyData.length - 1].ownerNetWorth,
-      finalRenterNetWorth: monthlyData[monthlyData.length - 1].renterNetWorth
+      finalOwnerNetWorth: lastMonthData ? lastMonthData.ownerNetWorth : 0,
+      finalRenterNetWorth: lastMonthData ? lastMonthData.renterNetWorth : 0,
+      renterTotalInitialContribution,
+      renterTotalContinuousContribution: renterTotalContinuousContributionPV,
+      renterTotalInitialYield,
+      renterTotalContinuousYield
     }
   };
 }

@@ -119,4 +119,28 @@ describe('simulateTimeline', () => {
 
       expect(lastMonth50.ownerNetWorth).toBeLessThan(lastMonth100.ownerNetWorth);
   });
+
+  it('calculates detailed renter metrics in summary', () => {
+    const result = simulateTimeline(defaultParams);
+    const { summary } = result;
+
+    // Initial Contribution should equal Down Payment
+    const expectedDownPayment = defaultParams.homePrice * (defaultParams.downPaymentPercentage / 100);
+    expect(summary.renterTotalInitialContribution).toBeCloseTo(expectedDownPayment, 2);
+
+    // Continuous Contribution should be positive (as rent < buy initially in some cases or discipline applied)
+    expect(summary.renterTotalContinuousContribution).toBeGreaterThanOrEqual(0);
+
+    // Yields should be reasonable (positive with 7% return)
+    expect(summary.renterTotalInitialYield).toBeGreaterThan(0);
+    expect(summary.renterTotalContinuousYield).toBeGreaterThanOrEqual(0);
+
+    // Sum of components should approximately equal final Renter Net Worth
+    const totalComponents = summary.renterTotalInitialContribution +
+                            summary.renterTotalInitialYield +
+                            summary.renterTotalContinuousContribution +
+                            summary.renterTotalContinuousYield;
+
+    expect(totalComponents).toBeCloseTo(summary.finalRenterNetWorth, 0);
+  });
 });
