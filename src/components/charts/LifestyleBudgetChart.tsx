@@ -59,7 +59,7 @@ export const LifestyleBudgetChart = () => {
             Monthly Lifestyle Budget
         </h3>
         <p className="text-sm text-zinc-400 mt-1">
-          Monthly income remaining after taxes and housing costs. This covers all essentials including food, transportation, student loans, etc.
+          Monthly income remaining after taxes and housing costs. This covers all essentials (food, transport) and discretionary spending (investments, entertainment, vacations).
         </p>
       </div>
 
