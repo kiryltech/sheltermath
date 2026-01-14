@@ -8,17 +8,17 @@ interface SimulationState {
 }
 
 export const DEFAULT_INPUTS: SimulationParams = {
-  homePrice: 525000, // San Bernardino Median (~$525k)
+  homePrice: 525000,
   // Realistic down payment for first-time buyers
   downPaymentPercentage: 10,
   mortgageRate: 6.5, // Current market rate (~6.5%)
   loanTermYears: 30,
-  propertyTaxRate: 1.32, // San Bernardino County effective rate
-  homeInsuranceRate: 0.30, // Fire risk adjusted (~$1600/yr)
+  propertyTaxRate: 1.32,
+  homeInsuranceRate: 0.30,
   maintenanceCostPercentage: 1.0,
   homeAppreciationRate: 3.5,
   sellingCostPercentage: 6.0,
-  monthlyRent: 2500, // San Bernardino 3bd House Rent
+  monthlyRent: 2500,
   rentInflationRate: 3.5,
   rentersInsuranceMonthly: 15,
   // S&P 500 historical average
@@ -29,12 +29,12 @@ export const DEFAULT_INPUTS: SimulationParams = {
   renterDiscipline: 0,
   ownerDiscipline: 0,
   pmiRate: 0.5, // Default PMI rate 0.5%
-  isProp13: true, // CA Prop 13 active
+  isProp13: true,
   inflationAdjusted: false,
   // Household Income (Dual income or slightly above median to afford)
   grossIncome: 115000,
   federalTaxRate: 22.0,
-  stateTaxRate: 9.3, // CA Tax Bracket
+  stateTaxRate: 9.3,
   incomeGrowthRate: 3.0,
   itemizedDeductionRate: 0, // Default to standard deduction (0% itemized benefit assumed initially)
 };
