@@ -49,24 +49,54 @@ export const SummaryMetrics = () => {
         </p>
       </div>
 
-      <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800">
-        <h4 className="text-zinc-400 text-sm font-medium mb-1">Net Worth Diff (Year {inputs.simulationYears})</h4>
-        <div className={`text-2xl font-bold ${isBuyingBetter ? 'text-green-400' : 'text-red-400'}`}>
-          {isBuyingBetter ? "+" : ""}{formatCurrency(netWorthDiff)}
+      <div className="flex flex-col gap-4">
+        <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800 flex-1">
+          <h4 className="text-zinc-400 text-sm font-medium mb-1">Net Worth Diff (Year {inputs.simulationYears})</h4>
+          <div className={`text-2xl font-bold ${isBuyingBetter ? 'text-green-400' : 'text-red-400'}`}>
+            {isBuyingBetter ? "+" : ""}{formatCurrency(netWorthDiff)}
+          </div>
+           <p className="text-xs text-zinc-500 mt-2">
+              {isBuyingBetter ? "Buying Advantage" : "Renting Advantage"}
+          </p>
         </div>
-         <p className="text-xs text-zinc-500 mt-2">
-            {isBuyingBetter ? "Buying Advantage" : "Renting Advantage"}
-        </p>
+        <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800 flex-1">
+          <h4 className="text-zinc-400 text-sm font-medium mb-1">Renter Inv. Contributions</h4>
+          <div className="flex flex-col gap-1 mt-2">
+             <div className="flex justify-between text-sm">
+                <span className="text-zinc-500">Initial</span>
+                <span className="text-white font-medium">{formatCurrency(summary.renterTotalInitialContribution)}</span>
+             </div>
+             <div className="flex justify-between text-sm">
+                <span className="text-zinc-500">Continuous</span>
+                <span className="text-white font-medium">{formatCurrency(summary.renterTotalContinuousContribution)}</span>
+             </div>
+          </div>
+        </div>
       </div>
 
-      <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800">
-        <h4 className="text-zinc-400 text-sm font-medium mb-1">Total Interest Paid</h4>
-        <div className="text-2xl font-bold text-white">
-          {formatCurrency(summary.totalInterestPaid)}
+      <div className="flex flex-col gap-4">
+        <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800 flex-1">
+          <h4 className="text-zinc-400 text-sm font-medium mb-1">Total Interest Paid</h4>
+          <div className="text-2xl font-bold text-white">
+            {formatCurrency(summary.totalInterestPaid)}
+          </div>
+          <p className="text-xs text-zinc-500 mt-2">
+              Over {inputs.simulationYears} years
+          </p>
         </div>
-        <p className="text-xs text-zinc-500 mt-2">
-            Over {inputs.simulationYears} years
-        </p>
+        <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800 flex-1">
+          <h4 className="text-zinc-400 text-sm font-medium mb-1">Renter Inv. Yield</h4>
+          <div className="flex flex-col gap-1 mt-2">
+             <div className="flex justify-between text-sm">
+                <span className="text-zinc-500">Initial</span>
+                <span className="text-white font-medium">{formatCurrency(summary.renterTotalInitialYield)}</span>
+             </div>
+             <div className="flex justify-between text-sm">
+                <span className="text-zinc-500">Continuous</span>
+                <span className="text-white font-medium">{formatCurrency(summary.renterTotalContinuousYield)}</span>
+             </div>
+          </div>
+        </div>
       </div>
 
     </div>

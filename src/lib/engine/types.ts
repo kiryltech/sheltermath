@@ -130,5 +130,9 @@ export interface SimulationResult {
     totalInterestPaid: number;
     finalOwnerNetWorth: number;
     finalRenterNetWorth: number;
+    renterTotalInitialContribution: number;
+    renterTotalContinuousContribution: number;
+    renterTotalInitialYield: number;
+    renterTotalContinuousYield: number;
   };
 }
