@@ -113,6 +113,9 @@ export const Sidebar = () => {
   // Helper for Down Payment in $
   const downPaymentAmount = inputs.homePrice * (inputs.downPaymentPercentage / 100);
 
+  // Helper for Home Insurance in $
+  const homeInsuranceAmount = inputs.homePrice * (inputs.homeInsuranceRate / 100);
+
   return (
     <>
       {/* Mobile Toggle Button (Only visible on mobile when sidebar is closed) */}
@@ -438,6 +441,7 @@ export const Sidebar = () => {
                 max={2}
                 step={0.05}
                 suffix="%"
+                helperText={formatCurrency(homeInsuranceAmount)}
                 inputClassName="w-20"
             />
              <SimulationInputGroup
