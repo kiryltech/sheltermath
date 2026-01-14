@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X, DollarSign, CircleHelp } from 'lucide-react';
+import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X, DollarSign, CircleHelp, Wallet, Receipt, PiggyBank } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { SimulationInputGroup } from './SimulationInputGroup';
 import { Checkbox } from './ui/Checkbox';
@@ -156,70 +156,8 @@ export const Sidebar = () => {
         {/* Scrollable Inputs Area */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 custom-scrollbar">
 
-        {/* Section: Household Income */}
-        <SidebarSection title="Household Income" icon={DollarSign}>
-            <SimulationInputGroup
-                label="Gross Income"
-                tooltip="Annual pre-tax household income."
-                value={inputs.grossIncome}
-                onChange={update('grossIncome')}
-                min={30000}
-                max={5000000}
-                step={5000}
-                prefix="$"
-                inputClassName="w-32"
-            />
-            <SimulationInputGroup
-                label="Federal Tax"
-                tooltip="Effective federal income tax rate."
-                value={inputs.federalTaxRate}
-                onChange={update('federalTaxRate')}
-                min={0}
-                max={50}
-                step={0.5}
-                suffix="%"
-                inputClassName="w-20"
-            />
-            <SimulationInputGroup
-                label="State Tax"
-                tooltip="Effective state income tax rate."
-                value={inputs.stateTaxRate}
-                onChange={update('stateTaxRate')}
-                min={0}
-                max={20}
-                step={0.1}
-                suffix="%"
-                inputClassName="w-20"
-            />
-             <SimulationInputGroup
-                label="Income Growth"
-                tooltip="Annual percentage increase in income. Defaults to inflation rate."
-                value={inputs.incomeGrowthRate ?? inputs.inflationRate}
-                onChange={update('incomeGrowthRate')}
-                min={0}
-                max={15}
-                step={0.1}
-                suffix="%"
-                inputClassName="w-20"
-            />
-            <SimulationInputGroup
-                label="Itemized Deduction"
-                tooltip="Percentage of mortgage interest and property tax you claim as a deduction (vs Standard Deduction)."
-                value={inputs.itemizedDeductionRate ?? 0}
-                onChange={update('itemizedDeductionRate')}
-                min={0}
-                max={100}
-                step={25}
-                suffix="%"
-                helperText={inputs.itemizedDeductionRate === 0 ? "Standard" : inputs.itemizedDeductionRate === 100 ? "Full" : "Partial"}
-                inputClassName="w-20"
-            />
-        </SidebarSection>
-
-        <hr className="border-white/5" />
-
-        {/* Section: Property */}
-        <SidebarSection title="Property Basics" icon={Home}>
+        {/* Group 1: Purchase Details */}
+        <SidebarSection title="Purchase Details" icon={Home}>
             <SimulationInputGroup
                 label="Home Price"
                 tooltip="Purchase price of the property."
@@ -282,39 +220,11 @@ export const Sidebar = () => {
 
         <hr className="border-white/5" />
 
-        {/* Section: Savings Discipline */}
-        <SidebarSection title="Savings Discipline" icon={TrendingUp}>
-             <SimulationInputGroup
-                label="Renter Discipline"
-                tooltip="% of monthly savings (vs buying) that renter invests."
-                value={inputs.renterDiscipline}
-                onChange={update('renterDiscipline')}
-                min={0}
-                max={100}
-                step={5}
-                suffix="%"
-                inputClassName="w-20"
-            />
-             <SimulationInputGroup
-                label="Owner Discipline"
-                tooltip="% of monthly savings (vs renting) that owner invests."
-                value={inputs.ownerDiscipline}
-                onChange={update('ownerDiscipline')}
-                min={0}
-                max={100}
-                step={5}
-                suffix="%"
-                inputClassName="w-20"
-            />
-        </SidebarSection>
-
-        <hr className="border-white/5" />
-
-        {/* Section: Rental Market */}
-        <SidebarSection title="Rental Market" icon={Building2}>
+        {/* Group 2: Rental Comparison */}
+        <SidebarSection title="Rental Comparison" icon={Building2}>
             <SimulationInputGroup
                 label="Monthly Rent"
-                tooltip="Current monthly rent for comparable property."
+                tooltip="Current monthly rent for a comparable property."
                 value={inputs.monthlyRent}
                 onChange={update('monthlyRent')}
                 min={500}
@@ -322,17 +232,6 @@ export const Sidebar = () => {
                 step={50}
                 prefix="$"
                 inputClassName="w-28"
-            />
-            <SimulationInputGroup
-                label="Rent Inflation"
-                tooltip="Annual percentage increase in rent."
-                value={inputs.rentInflationRate}
-                onChange={update('rentInflationRate')}
-                min={0}
-                max={15}
-                step={0.1}
-                suffix="%"
-                inputClassName="w-20"
             />
              <SimulationInputGroup
                 label="Renters Insurance"
@@ -349,60 +248,8 @@ export const Sidebar = () => {
 
         <hr className="border-white/5" />
 
-        {/* Section: Forecasts */}
-        <SidebarSection title="Forecasts" icon={TrendingUp}>
-            <SimulationInputGroup
-                label="Home Appreciation"
-                tooltip="Annual % increase in property value."
-                value={inputs.homeAppreciationRate}
-                onChange={update('homeAppreciationRate')}
-                min={-5}
-                max={15}
-                step={0.1}
-                suffix="%"
-                inputClassName="w-20"
-            />
-            <SimulationInputGroup
-                label="Investment Return"
-                tooltip="Expected annual return on investments."
-                value={inputs.investmentReturnRate}
-                onChange={update('investmentReturnRate')}
-                min={0}
-                max={15}
-                step={0.1}
-                suffix="%"
-                inputClassName="w-20"
-            />
-            <div className="space-y-3">
-                <SimulationInputGroup
-                    label="Inflation Rate"
-                    tooltip="General annual inflation rate."
-                    value={inputs.inflationRate}
-                    onChange={update('inflationRate')}
-                    min={0}
-                    max={15}
-                    step={0.1}
-                    suffix="%"
-                    inputClassName="w-20"
-                />
-                <div className="flex items-center gap-2 px-1">
-                    <Checkbox
-                        id="inflation-adjusted"
-                        checked={inputs.inflationAdjusted ?? false}
-                        onCheckedChange={(checked) => setInputs({ inflationAdjusted: checked })}
-                    />
-                    <label
-                        htmlFor="inflation-adjusted"
-                        className="text-xs text-zinc-400 cursor-pointer select-none hover:text-zinc-300 transition-colors flex items-center gap-1.5"
-                    >
-                        Adjust results for inflation
-                         <Tooltip content="Discount future values to today's dollars using inflation rate.">
-                            <CircleHelp className="w-3 h-3 text-zinc-500 hover:text-zinc-300" />
-                        </Tooltip>
-                    </label>
-                </div>
-            </div>
-
+        {/* Group 3: Recurring Home Costs */}
+        <SidebarSection title="Recurring Home Costs" icon={Receipt}>
             <div className="space-y-3">
                 <SimulationInputGroup
                     label="Property Tax"
@@ -452,6 +299,175 @@ export const Sidebar = () => {
                 min={0}
                 max={5}
                 step={0.1}
+                suffix="%"
+                inputClassName="w-20"
+            />
+        </SidebarSection>
+
+        <hr className="border-white/5" />
+
+        {/* Group 4: Income & Taxes */}
+        <SidebarSection title="Income & Taxes" icon={Wallet}>
+            <SimulationInputGroup
+                label="Gross Income"
+                tooltip="Annual pre-tax household income."
+                value={inputs.grossIncome}
+                onChange={update('grossIncome')}
+                min={30000}
+                max={5000000}
+                step={5000}
+                prefix="$"
+                inputClassName="w-32"
+            />
+            <SimulationInputGroup
+                label="Federal Tax"
+                tooltip="Effective federal income tax rate."
+                value={inputs.federalTaxRate}
+                onChange={update('federalTaxRate')}
+                min={0}
+                max={50}
+                step={0.5}
+                suffix="%"
+                inputClassName="w-20"
+            />
+            <SimulationInputGroup
+                label="State Tax"
+                tooltip="Effective state income tax rate."
+                value={inputs.stateTaxRate}
+                onChange={update('stateTaxRate')}
+                min={0}
+                max={20}
+                step={0.1}
+                suffix="%"
+                inputClassName="w-20"
+            />
+            <SimulationInputGroup
+                label="Deduction Capture"
+                tooltip="Percentage of mortgage interest and property tax effectively deducted (100% = Full Itemization)."
+                value={inputs.itemizedDeductionRate ?? 0}
+                onChange={update('itemizedDeductionRate')}
+                min={0}
+                max={100}
+                step={25}
+                suffix="%"
+                helperText={inputs.itemizedDeductionRate === 0 ? "Standard" : inputs.itemizedDeductionRate === 100 ? "Full" : "Partial"}
+                inputClassName="w-20"
+            />
+        </SidebarSection>
+
+        <hr className="border-white/5" />
+
+        {/* Group 5: Market Assumptions */}
+        <SidebarSection title="Market Assumptions" icon={TrendingUp}>
+            <SimulationInputGroup
+                label="Home Appreciation"
+                tooltip="Annual % increase in property value."
+                value={inputs.homeAppreciationRate}
+                onChange={update('homeAppreciationRate')}
+                min={-5}
+                max={15}
+                step={0.1}
+                suffix="%"
+                inputClassName="w-20"
+            />
+            <SimulationInputGroup
+                label="Rent Inflation"
+                tooltip="Annual percentage increase in rent."
+                value={inputs.rentInflationRate}
+                onChange={update('rentInflationRate')}
+                min={0}
+                max={15}
+                step={0.1}
+                suffix="%"
+                inputClassName="w-20"
+            />
+             <SimulationInputGroup
+                label="Income Growth"
+                tooltip="Annual percentage increase in income. Defaults to inflation rate."
+                value={inputs.incomeGrowthRate ?? inputs.inflationRate}
+                onChange={update('incomeGrowthRate')}
+                min={0}
+                max={15}
+                step={0.1}
+                suffix="%"
+                inputClassName="w-20"
+            />
+            <SimulationInputGroup
+                label="Investment Return"
+                tooltip="Expected annual return on investments (nominal)."
+                value={inputs.investmentReturnRate}
+                onChange={update('investmentReturnRate')}
+                min={0}
+                max={15}
+                step={0.1}
+                suffix="%"
+                inputClassName="w-20"
+            />
+             <div className="space-y-3">
+                <SimulationInputGroup
+                    label="Inflation Rate"
+                    tooltip="General annual inflation rate."
+                    value={inputs.inflationRate}
+                    onChange={update('inflationRate')}
+                    min={0}
+                    max={15}
+                    step={0.1}
+                    suffix="%"
+                    inputClassName="w-20"
+                />
+                <div className="flex items-center gap-2 px-1">
+                    <Checkbox
+                        id="inflation-adjusted"
+                        checked={inputs.inflationAdjusted ?? false}
+                        onCheckedChange={(checked) => setInputs({ inflationAdjusted: checked })}
+                    />
+                    <label
+                        htmlFor="inflation-adjusted"
+                        className="text-xs text-zinc-400 cursor-pointer select-none hover:text-zinc-300 transition-colors flex items-center gap-1.5"
+                    >
+                        Adjust results for inflation
+                         <Tooltip content="Discount future values to today's dollars using inflation rate.">
+                            <CircleHelp className="w-3 h-3 text-zinc-500 hover:text-zinc-300" />
+                        </Tooltip>
+                    </label>
+                </div>
+            </div>
+             <SimulationInputGroup
+                label="Selling Cost"
+                tooltip="Transaction costs at sale (Agent commissions, transfer taxes, etc)."
+                value={inputs.sellingCostPercentage ?? 6}
+                onChange={update('sellingCostPercentage')}
+                min={0}
+                max={12}
+                step={0.5}
+                suffix="%"
+                inputClassName="w-20"
+            />
+        </SidebarSection>
+
+        <hr className="border-white/5" />
+
+        {/* Group 6: Savings Strategy */}
+        <SidebarSection title="Savings Strategy" icon={PiggyBank}>
+             <SimulationInputGroup
+                label="Renter Invests Surplus"
+                tooltip="Percentage of monthly savings (Rent vs Buy) that the renter actually invests."
+                value={inputs.renterDiscipline}
+                onChange={update('renterDiscipline')}
+                min={0}
+                max={100}
+                step={5}
+                suffix="%"
+                inputClassName="w-20"
+            />
+             <SimulationInputGroup
+                label="Owner Invests Surplus"
+                tooltip="Percentage of monthly savings (Buy vs Rent) that the owner actually invests."
+                value={inputs.ownerDiscipline}
+                onChange={update('ownerDiscipline')}
+                min={0}
+                max={100}
+                step={5}
                 suffix="%"
                 inputClassName="w-20"
             />
