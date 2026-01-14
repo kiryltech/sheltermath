@@ -8,6 +8,7 @@ import { callGemini } from '@/lib/ai/gemini';
 import { generateAnalysisPrompt } from '@/lib/ai/prompt';
 import { Bot, Key, Loader2, AlertCircle, Copy, Check, FileText } from 'lucide-react';
 import { Checkbox } from './ui/Checkbox';
+import { cn } from '@/lib/utils';
 
 interface AiAdvisorModalProps {
   isOpen: boolean;
@@ -250,8 +251,23 @@ export const AiAdvisorModal: React.FC<AiAdvisorModalProps> = ({ isOpen, onClose 
                     <span className="hidden sm:inline">{isCopied ? 'Copied' : 'Copy'}</span>
                   </button>
                </div>
-               <div className="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed">
-                  <ReactMarkdown>{result}</ReactMarkdown>
+               <div className="text-zinc-300 text-sm">
+                  <ReactMarkdown
+                    components={{
+                        h1: ({children}) => <h1 className="text-2xl font-bold text-white mb-4 mt-6 first:mt-0">{children}</h1>,
+                        h2: ({children}) => <h2 className="text-xl font-bold text-white mb-3 mt-5">{children}</h2>,
+                        h3: ({children}) => <h3 className="text-lg font-semibold text-white mb-2 mt-4">{children}</h3>,
+                        p: ({children}) => <p className="mb-4 leading-relaxed text-zinc-300">{children}</p>,
+                        ul: ({children}) => <ul className="list-disc pl-5 mb-4 space-y-1.5 text-zinc-300">{children}</ul>,
+                        ol: ({children}) => <ol className="list-decimal pl-5 mb-4 space-y-1.5 text-zinc-300">{children}</ol>,
+                        li: ({children}) => <li className="pl-1">{children}</li>,
+                        strong: ({children}) => <strong className="font-semibold text-white">{children}</strong>,
+                        blockquote: ({children}) => <blockquote className="border-l-4 border-indigo-500/50 pl-4 py-1 my-4 bg-indigo-500/5 rounded-r-lg italic text-zinc-400">{children}</blockquote>,
+                        code: ({children}) => <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono text-xs">{children}</code>,
+                    }}
+                  >
+                      {result}
+                  </ReactMarkdown>
                </div>
             </div>
 
