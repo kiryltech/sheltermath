@@ -14,9 +14,11 @@ import { BarChart3, Bot } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { cn } from '@/lib/utils';
+import { AiAdvisorModal } from '@/components/AiAdvisorModal';
 
 export default function Home() {
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const { inputs, setInputs } = useSimulationStore();
 
   return (
@@ -50,9 +52,10 @@ export default function Home() {
                     </div>
 
                     {/* AI Assistant Button */}
-                    <Tooltip content="Coming soon">
+                    <Tooltip content="Get AI Analysis">
                         <button
-                            className="p-2 text-zinc-400 bg-zinc-800/50 border border-zinc-700 rounded-lg cursor-not-allowed opacity-75 hover:bg-zinc-800 transition-colors"
+                            onClick={() => setIsAiModalOpen(true)}
+                            className="p-2 text-zinc-400 bg-zinc-800/50 border border-zinc-700 rounded-lg hover:text-white hover:bg-zinc-800 transition-colors"
                             aria-label="AI Assistant"
                         >
                             <Bot className="w-5 h-5" />
@@ -91,6 +94,11 @@ export default function Home() {
             >
               {isBreakdownOpen && <AnnualBreakdownCharts />}
             </Modal>
+
+            <AiAdvisorModal
+              isOpen={isAiModalOpen}
+              onClose={() => setIsAiModalOpen(false)}
+            />
 
             <Footer />
         </div>
