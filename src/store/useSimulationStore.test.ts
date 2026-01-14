@@ -12,7 +12,7 @@ describe('useSimulationStore', () => {
 
   it('should initialize with default inputs', () => {
     const { result } = renderHook(() => useSimulationStore());
-    expect(result.current.inputs.homePrice).toBe(850000);
+    expect(result.current.inputs.homePrice).toBe(525000);
     expect(result.current.results).toBeDefined();
   });
 
@@ -42,6 +42,6 @@ describe('useSimulationStore', () => {
     });
 
     expect(result.current.inputs.mortgageRate).toBe(3.0);
-    expect(result.current.inputs.homePrice).toBe(850000); // Should remain same
+    expect(result.current.inputs.homePrice).toBe(525000); // Should remain same
   });
 });
