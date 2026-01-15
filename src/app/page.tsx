@@ -21,33 +21,47 @@ export default function Home() {
   const { inputs, setInputs } = useSimulationStore();
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden flex-col md:flex-row">
+    <div className="flex h-screen overflow-hidden flex-col md:flex-row bg-transparent">
       <Sidebar />
-      <main className="flex-1 flex flex-col p-4 md:p-8 w-full overflow-y-auto">
-        <div className="max-w-7xl mx-auto w-full">
-            <header className="h-auto border-b border-white/5 bg-zinc-900/80 backdrop-blur px-6 py-4 flex flex-col gap-4 z-10 mb-6 rounded-xl border-zinc-800">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+
+      <main className="flex-1 flex flex-col w-full overflow-y-auto relative scroll-smooth">
+        {/* Decorative background element for main area */}
+        <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none" />
+
+        <div className="p-4 md:p-8 max-w-[1600px] mx-auto w-full flex flex-col gap-6">
+
+            {/* Header Card */}
+            <header className="relative overflow-hidden rounded-2xl bg-zinc-900/60 backdrop-blur-xl border border-white/5 p-6 shadow-2xl z-10">
+                <div className="absolute top-0 right-0 p-32 bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none" />
+
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
                     <div>
-                        <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                            The Verdict
-                            <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-[10px] text-zinc-400 font-mono border border-white/5 uppercase tracking-wide">
+                        <div className="flex items-center gap-3 mb-2">
+                             <h2 className="text-2xl font-bold text-white tracking-tight">
+                                The Verdict
+                            </h2>
+                            <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-zinc-800 to-zinc-900 text-[11px] text-zinc-300 font-bold border border-white/10 uppercase tracking-wider shadow-sm">
                                 {inputs.simulationYears} Year Outlook
                             </span>
-                        </h2>
-                        <p className="text-sm text-zinc-400 mt-1">Comparing total financial outcome of buying this property vs. renting and investing the difference.</p>
+                        </div>
+
+                        <p className="text-sm text-zinc-400 max-w-xl leading-relaxed">
+                            Comparing the long-term financial outcomes of buying a property versus renting and investing the difference.
+                        </p>
                     </div>
-                    <div className="flex items-center gap-4">
+
+                    <div className="flex items-center gap-3">
                         {/* Years Selector */}
-                        <div className="bg-zinc-900 p-1 rounded-lg flex border border-white/5">
+                        <div className="bg-zinc-950/50 p-1 rounded-xl flex border border-white/5 shadow-inner">
                             {[20, 35, 50].map((years) => (
                                 <button
                                     key={years}
                                     onClick={() => setInputs({ simulationYears: years })}
                                     className={cn(
-                                        "px-3 py-1 text-xs font-medium rounded shadow-sm transition-colors",
+                                        "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200",
                                         inputs.simulationYears === years
-                                            ? "text-white bg-white/10"
-                                            : "text-zinc-400 hover:text-white"
+                                            ? "text-white bg-zinc-800 shadow-md border border-white/5"
+                                            : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
                                     )}
                                 >
                                     {years}Y
@@ -58,34 +72,39 @@ export default function Home() {
                         {/* AI Assistant Button */}
                         <button
                             onClick={() => setIsAiModalOpen(true)}
-                            className="flex items-center gap-2 bg-[#5048e5] hover:bg-[#5048e5]/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-[0_0_15px_-3px_rgba(80,72,229,0.3)]"
+                            className="group relative inline-flex items-center gap-2 bg-gradient-to-br from-indigo-500 to-violet-600 hover:to-violet-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-[0_0_20px_-5px_rgba(99,102,241,0.4)] hover:shadow-[0_0_25px_-5px_rgba(99,102,241,0.6)] hover:-translate-y-0.5 active:translate-y-0"
                         >
-                            <Sparkles className="w-4 h-4" />
-                            AI Analysis
+                            <Sparkles className="w-4 h-4 text-indigo-100 group-hover:text-white transition-colors" />
+                            <span>AI Analysis</span>
+                            <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 pointer-events-none" />
                         </button>
                     </div>
                 </div>
             </header>
 
+            {/* Metrics Grid */}
             <SummaryMetrics />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Charts Grid 1 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <HousingIncomeRatioChart />
                 <LifestyleBudgetChart />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Charts Grid 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <NetWorthChart />
                 <CashFlowChart />
             </div>
 
-            <div className="mb-8 flex justify-center">
+            {/* View Breakdown Button */}
+            <div className="flex justify-center pt-4 pb-8">
               <button
                 onClick={() => setIsBreakdownOpen(true)}
-                className="flex items-center gap-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-lg transition-colors border border-zinc-700 hover:border-zinc-600 shadow-sm"
+                className="group flex items-center gap-2 px-8 py-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-semibold rounded-2xl transition-all border border-zinc-800 hover:border-zinc-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
-                <BarChart3 className="w-5 h-5" />
-                View Annual Breakdown
+                <BarChart3 className="w-5 h-5 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
+                <span>View Annual Breakdown</span>
               </button>
             </div>
 

@@ -72,18 +72,28 @@ const SidebarSection: React.FC<SectionProps> = ({ title, icon: Icon, children, d
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-3">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 w-full text-left hover:text-zinc-300 transition-colors"
+                className="flex items-center gap-3 w-full text-left group transition-all duration-200"
             >
-                <Icon className="text-zinc-500 w-4 h-4" />
-                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-500 flex-1">{title}</h2>
-                {isOpen ? <ChevronDown className="w-3 h-3 text-zinc-500" /> : <ChevronRight className="w-3 h-3 text-zinc-500" />}
+                <div className={cn(
+                    "p-1.5 rounded-md transition-colors",
+                    isOpen ? "bg-primary/10 text-primary" : "bg-zinc-800/50 text-zinc-500 group-hover:bg-zinc-800 group-hover:text-zinc-400"
+                )}>
+                    <Icon className="w-4 h-4" />
+                </div>
+                <h2 className={cn(
+                    "text-xs font-bold uppercase tracking-wider flex-1 transition-colors",
+                    isOpen ? "text-zinc-200" : "text-zinc-500 group-hover:text-zinc-400"
+                )}>
+                    {title}
+                </h2>
+                {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-500" />}
             </button>
 
             {isOpen && (
-                <div className="flex flex-col gap-5 pl-1">
+                <div className="flex flex-col gap-6 pl-2 pr-1 border-l border-white/5 ml-3.5 py-2">
                     {children}
                 </div>
             )}
@@ -121,7 +131,7 @@ export const Sidebar = () => {
       {/* Mobile Toggle Button (Only visible on mobile when sidebar is closed) */}
       {!isOpenMobile && (
         <button
-          className="md:hidden fixed top-4 left-4 z-50 p-2 bg-zinc-800 text-white rounded-md shadow-lg"
+          className="md:hidden fixed top-4 left-4 z-50 p-2 bg-zinc-800/80 backdrop-blur text-white rounded-md shadow-lg border border-white/10"
           onClick={() => setIsOpenMobile(true)}
         >
           <Menu className="w-6 h-6" />
@@ -131,22 +141,24 @@ export const Sidebar = () => {
       {/* Sidebar Container */}
       <aside
         className={cn(
-            "fixed inset-y-0 left-0 z-40 w-full md:relative md:w-[320px] flex-shrink-0 bg-surface-dark border-r border-white/5 flex flex-col h-full shadow-xl overflow-hidden transition-transform duration-300 ease-in-out md:translate-x-0 font-display",
+            "fixed inset-y-0 left-0 z-40 w-full md:relative md:w-[340px] flex-shrink-0 bg-zinc-950/80 backdrop-blur-xl border-r border-white/5 flex flex-col h-full shadow-2xl overflow-hidden transition-transform duration-300 ease-in-out md:translate-x-0 font-display",
             isOpenMobile ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Header */}
-        <div className="px-6 py-5 border-b border-white/5 bg-surface-dark/50 backdrop-blur-sm sticky top-0 z-10 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-[24px]">domain</span>
+        <div className="px-6 py-6 border-b border-white/5 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <span className="material-symbols-outlined text-white text-[24px]">domain</span>
+              </div>
               <div>
-                <h1 className="text-sm font-bold tracking-tight text-white uppercase">{APP_NAME}</h1>
-                <p className="text-xs text-zinc-500 font-mono">{APP_VERSION}</p>
+                <h1 className="text-sm font-bold tracking-tight text-white uppercase leading-tight">{APP_NAME}</h1>
+                <p className="text-[10px] text-zinc-500 font-mono tracking-wide mt-0.5 opacity-70">VERSION {APP_VERSION}</p>
               </div>
           </div>
           {/* Mobile Close Button */}
           <button
-            className="md:hidden p-1 text-zinc-400 hover:text-white"
+            className="md:hidden p-1 text-zinc-400 hover:text-white transition-colors"
             onClick={() => setIsOpenMobile(false)}
           >
             <X className="w-6 h-6" />
@@ -154,7 +166,7 @@ export const Sidebar = () => {
         </div>
 
         {/* Scrollable Inputs Area */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 custom-scrollbar scroll-smooth">
 
         {/* Group 1: Purchase Details */}
         <SidebarSection title="Purchase Details" icon={Home}>
@@ -218,8 +230,6 @@ export const Sidebar = () => {
             />
         </SidebarSection>
 
-        <hr className="border-white/5" />
-
         {/* Group 2: Rental Comparison */}
         <SidebarSection title="Rental Comparison" icon={Building2}>
             <SimulationInputGroup
@@ -246,8 +256,6 @@ export const Sidebar = () => {
             />
         </SidebarSection>
 
-        <hr className="border-white/5" />
-
         {/* Group 3: Recurring Home Costs */}
         <SidebarSection title="Recurring Home Costs" icon={Receipt}>
             <div className="space-y-3">
@@ -262,7 +270,7 @@ export const Sidebar = () => {
                     suffix="%"
                     inputClassName="w-20"
                 />
-                <div className="flex items-center gap-2 px-1">
+                <div className="flex items-center gap-3 px-1 pt-1">
                     <Checkbox
                         id="prop-13"
                         checked={inputs.isProp13 ?? false}
@@ -274,7 +282,7 @@ export const Sidebar = () => {
                     >
                         Enable CA Prop 13 limits
                         <Tooltip content="Limit assessed value growth to 2% per year (California rule).">
-                            <CircleHelp className="w-3 h-3 text-zinc-500 hover:text-zinc-300" />
+                            <CircleHelp className="w-3.5 h-3.5 text-zinc-500 hover:text-zinc-300" />
                         </Tooltip>
                     </label>
                 </div>
@@ -303,8 +311,6 @@ export const Sidebar = () => {
                 inputClassName="w-20"
             />
         </SidebarSection>
-
-        <hr className="border-white/5" />
 
         {/* Group 4: Income & Taxes */}
         <SidebarSection title="Income & Taxes" icon={Wallet}>
@@ -354,8 +360,6 @@ export const Sidebar = () => {
                 inputClassName="w-20"
             />
         </SidebarSection>
-
-        <hr className="border-white/5" />
 
         {/* Group 5: Market Assumptions */}
         <SidebarSection title="Market Assumptions" icon={TrendingUp}>
@@ -415,7 +419,7 @@ export const Sidebar = () => {
                     suffix="%"
                     inputClassName="w-20"
                 />
-                <div className="flex items-center gap-2 px-1">
+                <div className="flex items-center gap-3 px-1 pt-1">
                     <Checkbox
                         id="inflation-adjusted"
                         checked={inputs.inflationAdjusted ?? false}
@@ -427,7 +431,7 @@ export const Sidebar = () => {
                     >
                         Adjust results for inflation
                          <Tooltip content="Discount future values to today's dollars using inflation rate.">
-                            <CircleHelp className="w-3 h-3 text-zinc-500 hover:text-zinc-300" />
+                            <CircleHelp className="w-3.5 h-3.5 text-zinc-500 hover:text-zinc-300" />
                         </Tooltip>
                     </label>
                 </div>
@@ -444,8 +448,6 @@ export const Sidebar = () => {
                 inputClassName="w-20"
             />
         </SidebarSection>
-
-        <hr className="border-white/5" />
 
         {/* Group 6: Savings Strategy */}
         <SidebarSection title="Savings Strategy" icon={PiggyBank}>

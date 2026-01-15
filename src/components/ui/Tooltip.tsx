@@ -18,10 +18,12 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, children }) => {
     >
       {children}
       {isVisible && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 text-xs text-white bg-zinc-800 rounded shadow-lg border border-white/10 z-50 pointer-events-none">
+        <div
+            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 p-3 text-xs text-zinc-100 bg-zinc-900/95 backdrop-blur-md rounded-lg shadow-xl border border-white/10 z-50 animate-in fade-in zoom-in-95 duration-200"
+        >
           {content}
           {/* Arrow */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800" />
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-900/95" />
         </div>
       )}
     </div>

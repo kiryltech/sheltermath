@@ -33,32 +33,33 @@ export const SimulationInputGroup: React.FC<SimulationInputGroupProps> = ({
   tooltip,
 }) => {
   return (
-    <div className="group">
-      <div className="flex justify-between items-center mb-2">
-        <div className="text-sm font-medium text-zinc-300">
-          {label}
-          {tooltip && (
-            <span className="ml-2 inline-flex">
-              <Tooltip content={tooltip}>
-                <CircleHelp className="w-3.5 h-3.5 text-zinc-500 hover:text-zinc-300 transition-colors cursor-help" />
-              </Tooltip>
-            </span>
-          )}
+    <div className="group space-y-3">
+      <div className="flex justify-between items-start gap-4">
+        <div className="flex-1">
+            <div className="flex items-center gap-1.5 mb-0.5">
+                <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-200 transition-colors">
+                    {label}
+                </span>
+                {tooltip && (
+                    <Tooltip content={tooltip}>
+                        <CircleHelp className="w-3.5 h-3.5 text-zinc-500 hover:text-zinc-300 transition-colors cursor-help" />
+                    </Tooltip>
+                )}
+            </div>
+             {helperText && (
+                <p className="text-[10px] text-zinc-500 font-mono tracking-tight">
+                {helperText}
+                </p>
+            )}
         </div>
-        <div className="flex items-center gap-2">
-          {helperText && (
-            <span className="text-xs text-zinc-500 font-mono tabular-nums">
-              {helperText}
-            </span>
-          )}
-          <NumberInput
+
+        <NumberInput
             value={value}
             onChange={onChange}
             prefix={prefix}
             suffix={suffix}
-            className={cn("w-24", inputClassName)} // Default to w-24, allow override
-          />
-        </div>
+            className={cn("w-24 shrink-0", inputClassName)}
+        />
       </div>
       <Slider
         min={min}

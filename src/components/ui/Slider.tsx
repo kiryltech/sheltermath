@@ -35,7 +35,7 @@ export const Slider: React.FC<SliderProps> = ({
       onChange={handleChange}
       className={cn("w-full accent-primary cursor-pointer", className)}
       style={{
-          background: `linear-gradient(to right, #5048e5 ${progress}%, #3f3f46 ${progress}%)`
+          background: `linear-gradient(to right, #6366f1 ${progress}%, #27272a ${progress}%)`
       }}
     />
   );
