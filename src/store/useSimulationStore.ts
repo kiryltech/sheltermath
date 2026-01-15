@@ -8,19 +8,19 @@ interface SimulationState {
 }
 
 export const DEFAULT_INPUTS: SimulationParams = {
-  homePrice: 850000,
-  // Who can afford 20% down payment?
-  downPaymentPercentage: 5,
-  mortgageRate: 6.875,
+  homePrice: 525000,
+  // Realistic down payment for first-time buyers
+  downPaymentPercentage: 10,
+  mortgageRate: 6.5, // Current market rate (~6.5%)
   loanTermYears: 30,
-  propertyTaxRate: 1.2,
-  homeInsuranceRate: 0.35,
+  propertyTaxRate: 1.32,
+  homeInsuranceRate: 0.30,
   maintenanceCostPercentage: 1.0,
-  homeAppreciationRate: 4.0,
+  homeAppreciationRate: 3.5,
   sellingCostPercentage: 6.0,
-  monthlyRent: 4200,
-  rentInflationRate: 4.5,
-  rentersInsuranceMonthly: 0,
+  monthlyRent: 2500,
+  rentInflationRate: 3.5,
+  rentersInsuranceMonthly: 15,
   // S&P 500 historical average
   investmentReturnRate: 10.0,
   inflationRate: 3.0,
@@ -31,10 +31,10 @@ export const DEFAULT_INPUTS: SimulationParams = {
   pmiRate: 0.5, // Default PMI rate 0.5%
   isProp13: false,
   inflationAdjusted: false,
-  // Household Income
-  grossIncome: 200000,
+  // Household Income (Dual income or slightly above median to afford)
+  grossIncome: 115000,
   federalTaxRate: 22.0,
-  stateTaxRate: 10.0,
+  stateTaxRate: 9.3,
   incomeGrowthRate: 3.0,
   itemizedDeductionRate: 0, // Default to standard deduction (0% itemized benefit assumed initially)
 };
