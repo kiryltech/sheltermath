@@ -10,9 +10,8 @@ import { LifestyleBudgetChart } from '@/components/charts/LifestyleBudgetChart';
 import { SummaryMetrics } from '@/components/SummaryMetrics';
 import { Modal } from '@/components/ui/Modal';
 import { Footer } from '@/components/Footer';
-import { BarChart3, Bot } from 'lucide-react';
+import { BarChart3, Sparkles } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
-import { Tooltip } from '@/components/ui/Tooltip';
 import { cn } from '@/lib/utils';
 import { AiAdvisorModal } from '@/components/AiAdvisorModal';
 
@@ -26,41 +25,45 @@ export default function Home() {
       <Sidebar />
       <main className="flex-1 flex flex-col p-4 md:p-8 w-full overflow-y-auto">
         <div className="max-w-7xl mx-auto w-full">
-            <header className="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-4">
-                <div>
-                  <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Rent vs. Buy Analysis</h1>
-                  <p className="text-zinc-400 max-w-2xl">Compare the long-term financial outcomes of buying a home versus renting and investing. Customize economic assumptions to forecast your net worth and cash flow over time.</p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    {/* Years Selector */}
-                    <div className="flex bg-zinc-800 rounded-lg p-1 border border-zinc-700">
-                        {[20, 35, 50].map((years) => (
-                            <button
-                                key={years}
-                                onClick={() => setInputs({ simulationYears: years })}
-                                className={cn(
-                                    "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
-                                    inputs.simulationYears === years
-                                        ? "bg-zinc-600 text-white shadow-sm"
-                                        : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/50"
-                                )}
-                            >
-                                {years} Years
-                            </button>
-                        ))}
+            <header className="h-auto border-b border-white/5 bg-zinc-900/80 backdrop-blur px-6 py-4 flex flex-col gap-4 z-10 mb-6 rounded-xl border-zinc-800">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                            The Verdict
+                            <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-[10px] text-zinc-400 font-mono border border-white/5 uppercase tracking-wide">
+                                {inputs.simulationYears} Year Outlook
+                            </span>
+                        </h2>
+                        <p className="text-sm text-zinc-400 mt-1">Comparing total financial outcome of buying this property vs. renting and investing the difference.</p>
                     </div>
+                    <div className="flex items-center gap-4">
+                        {/* Years Selector */}
+                        <div className="bg-zinc-900 p-1 rounded-lg flex border border-white/5">
+                            {[20, 35, 50].map((years) => (
+                                <button
+                                    key={years}
+                                    onClick={() => setInputs({ simulationYears: years })}
+                                    className={cn(
+                                        "px-3 py-1 text-xs font-medium rounded shadow-sm transition-colors",
+                                        inputs.simulationYears === years
+                                            ? "text-white bg-white/10"
+                                            : "text-zinc-400 hover:text-white"
+                                    )}
+                                >
+                                    {years}Y
+                                </button>
+                            ))}
+                        </div>
 
-                    {/* AI Assistant Button */}
-                    <Tooltip content="Get AI Analysis">
+                        {/* AI Assistant Button */}
                         <button
                             onClick={() => setIsAiModalOpen(true)}
-                            className="p-2 text-zinc-400 bg-zinc-800/50 border border-zinc-700 rounded-lg hover:text-white hover:bg-zinc-800 transition-colors"
-                            aria-label="AI Assistant"
+                            className="flex items-center gap-2 bg-[#5048e5] hover:bg-[#5048e5]/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-[0_0_15px_-3px_rgba(80,72,229,0.3)]"
                         >
-                            <Bot className="w-5 h-5" />
+                            <Sparkles className="w-4 h-4" />
+                            AI Analysis
                         </button>
-                    </Tooltip>
+                    </div>
                 </div>
             </header>
 
