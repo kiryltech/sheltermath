@@ -4,7 +4,7 @@ authors:
 - family-names: "Dubarenka"
   given-names: "Kiryl"
 title: "Shelter Math: Rent vs. Buy Simulator"
-version: 0.7.0
+version: 1.0.0
 date-released: 2026-01-12
 url: "https://github.com/kiryltech/sheltermath"
 abstract: >-
