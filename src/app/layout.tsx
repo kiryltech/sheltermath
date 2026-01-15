@@ -25,9 +25,13 @@ export const metadata: Metadata = {
     "rent vs buy",
     "buy or rent",
   ],
-  authors: [{ name: "Shelter Math" }],
-  creator: "Shelter Math",
-  publisher: "Shelter Math",
+  authors: [
+    { name: "Kiryl Dubarenka" },
+    { name: "Engineering the Future" },
+    { name: "Jules" },
+  ],
+  creator: "Kiryl Dubarenka",
+  publisher: "Engineering the Future",
   robots: {
     index: true,
     follow: true,
