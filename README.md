@@ -1,5 +1,9 @@
 # sheltermath
 
+[Live Production App](https://sheltermath.engineeringthefuture.ai/)
+
+![Shelter Math Screenshot](public/app-screenshot.png)
+
 A mathematically rigorous, single-page interactive web application that provides a side-by-side financial comparison of Renting vs. Buying over a configurable timeline.
 
 Designed as a "Financial Cockpit", sheltermath helps users visualize the long-term impact of their housing decisions, factoring in opportunity costs, investment returns, and disciplined saving strategies.
