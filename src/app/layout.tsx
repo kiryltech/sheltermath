@@ -17,6 +17,28 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://sheltermath.engineeringthefuture.ai/'),
   title: "Shelter Math | Rent vs Buy Simulator",
   description: "A brutally logical Rent vs Buy simulator with interactive charts and AI analysis.",
+  keywords: [
+    "rent vs buy calculator",
+    "real estate investment simulator",
+    "housing market analysis",
+    "mortgage calculator",
+    "rent vs buy",
+    "buy or rent",
+  ],
+  authors: [
+    { name: "Kiryl Dubarenka" },
+    { name: "Engineering the Future" },
+    { name: "Jules" },
+  ],
+  creator: "Kiryl Dubarenka",
+  publisher: "Engineering the Future",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://sheltermath.engineeringthefuture.ai/",
+  },
   openGraph: {
     title: "Shelter Math | Rent vs Buy Simulator",
     description: "A brutally logical Rent vs Buy simulator with interactive charts and AI analysis.",

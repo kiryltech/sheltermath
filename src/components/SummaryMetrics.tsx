@@ -19,7 +19,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, icon: Icon, children, cl
         className
     )}>
         <div className="flex items-start justify-between mb-2">
-            <h4 className="text-zinc-400 text-xs font-bold uppercase tracking-wider">{title}</h4>
+            <h3 className="text-zinc-400 text-xs font-bold uppercase tracking-wider">{title}</h3>
             {Icon && <Icon className="w-4 h-4 text-zinc-600 group-hover:text-primary transition-colors" />}
         </div>
         <div className="relative z-10">
