@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { cn } from '@/lib/utils'; // Assuming cn exists, I'll check this next
+import { cn } from '@/lib/utils';
 
 interface NumberInputProps {
   value: number;
@@ -31,7 +31,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   const [localValue, setLocalValue] = React.useState<string>(formatNumber(value));
   const [isFocused, setIsFocused] = React.useState(false);
 
-  // Sync local value when prop changes externally, but only if not focused (to avoid fighting user input)
+  // Sync local value when prop changes externally, but only if not focused
   React.useEffect(() => {
     if (!isFocused) {
         setLocalValue(formatNumber(value));
@@ -41,51 +41,35 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
 
-    // Allow numbers, commas, and decimal point
-    // Regex allows: digits, commas, optional single decimal point followed by digits
     if (/^[\d,]*\.?[\d]*$/.test(rawValue)) {
         setLocalValue(rawValue);
 
         const numValue = parseNumber(rawValue);
         if (!isNaN(numValue)) {
             onChange(numValue);
-        } else if (rawValue === '') {
-             // Optional: Handle empty input
         }
     }
   };
 
   const handleFocus = () => {
       setIsFocused(true);
-      // On focus, strip commas for easier editing?
-      // Actually, standard behavior is often to keep them or strip them.
-      // Let's keep them for now, but ensure parsing handles them.
-      // If we want to strip on focus:
-      // setLocalValue(localValue.replace(/,/g, ''));
-      // But user asked for comma as separator, implying display.
-      // Let's keep commas in display always if possible, or re-add them as user types?
-      // Simple approach: Format on blur. Strip on focus?
-      // Let's strip on focus to make editing easier (standard for some number inputs),
-      // OR keep them and handle cursor... handling cursor with commas is hard.
-      // Easiest robust UX: Strip commas on focus (raw number), format on blur.
       setLocalValue(value.toString());
   };
 
   const handleBlur = () => {
       setIsFocused(false);
-      // On blur, re-format
       const num = parseNumber(localValue);
       if (!isNaN(num)) {
           setLocalValue(formatNumber(num));
       } else {
-          setLocalValue(formatNumber(value)); // Revert if invalid
+          setLocalValue(formatNumber(value));
       }
   };
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative group", className)}>
         {prefix && (
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-medium group-focus-within:text-zinc-300 transition-colors">
                 {prefix}
             </span>
         )}
@@ -96,13 +80,15 @@ export const NumberInput: React.FC<NumberInputProps> = ({
             onFocus={handleFocus}
             onBlur={handleBlur}
             className={cn(
-                "w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-right font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary tabular-nums shadow-sm transition-all",
-                prefix && "pl-5",
-                suffix && "pr-6" // Add padding for suffix
+                "w-full bg-zinc-900/50 border border-zinc-700/50 rounded-lg px-2 py-1.5 text-right font-mono text-sm text-zinc-100",
+                "focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 focus:bg-zinc-900",
+                "hover:border-zinc-600 transition-all duration-200 shadow-sm",
+                prefix && "pl-6", // slightly more padding
+                suffix && "pr-7"
             )}
         />
          {suffix && (
-            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-medium group-focus-within:text-zinc-300 transition-colors">
                 {suffix}
             </span>
         )}

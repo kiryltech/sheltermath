@@ -2,6 +2,35 @@
 
 import React from 'react';
 import { useSimulationStore } from '@/store/useSimulationStore';
+import { TrendingUp, Wallet, PiggyBank, Receipt, Scale, ArrowRightLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface MetricCardProps {
+    title: string;
+    icon?: React.ElementType;
+    children: React.ReactNode;
+    className?: string;
+    subtext?: string;
+}
+
+const MetricCard: React.FC<MetricCardProps> = ({ title, icon: Icon, children, className, subtext }) => (
+    <div className={cn(
+        "relative overflow-hidden p-6 rounded-2xl bg-zinc-900/40 border border-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/10 hover:bg-zinc-900/60 group",
+        className
+    )}>
+        <div className="flex items-start justify-between mb-2">
+            <h4 className="text-zinc-400 text-xs font-bold uppercase tracking-wider">{title}</h4>
+            {Icon && <Icon className="w-4 h-4 text-zinc-600 group-hover:text-primary transition-colors" />}
+        </div>
+        <div className="relative z-10">
+            {children}
+        </div>
+        {subtext && <p className="text-xs text-zinc-500 mt-2 font-medium">{subtext}</p>}
+
+        {/* Glow effect */}
+        <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-full blur-2xl group-hover:from-primary/10 transition-all duration-500" />
+    </div>
+);
 
 export const SummaryMetrics = () => {
   const { results, inputs } = useSimulationStore();
@@ -16,87 +45,92 @@ export const SummaryMetrics = () => {
     const months = totalMonths % 12;
 
     const parts = [];
-    if (years > 0) parts.push(`${years} year${years === 1 ? '' : 's'}`);
-    if (months > 0) parts.push(`${months} month${months === 1 ? '' : 's'}`);
+    if (years > 0) parts.push(`${years} Yr${years === 1 ? '' : 's'}`);
+    if (months > 0) parts.push(`${months} Mo${months === 1 ? '' : 's'}`);
 
     if (parts.length === 0) return "Immediate";
-    return parts.join(', ');
+    return parts.join(' ');
   };
 
   const netWorthDiff = summary.finalOwnerNetWorth - summary.finalRenterNetWorth;
   const isBuyingBetter = netWorthDiff > 0;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full mb-8">
 
-      <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800">
-        <h4 className="text-zinc-400 text-sm font-medium mb-1">Equity Crossover</h4>
-        <div className="text-2xl font-bold text-white">
+      <MetricCard
+        title="Equity Crossover"
+        icon={TrendingUp}
+        subtext="When buying beats renting net worth"
+      >
+        <div className="text-3xl font-bold text-white tracking-tight">
           {crossoverDate ? formatDuration(crossoverDate.totalMonths) : "Never"}
         </div>
-        <p className="text-xs text-zinc-500 mt-2">
-            When buying becomes wealthier than renting
-        </p>
-      </div>
+      </MetricCard>
 
-      <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800">
-        <h4 className="text-zinc-400 text-sm font-medium mb-1">Monthly Payment Crossover</h4>
-        <div className="text-2xl font-bold text-white">
+      <MetricCard
+        title="Monthly Break-Even"
+        icon={Scale}
+        subtext="When owning costs less monthly"
+      >
+        <div className="text-3xl font-bold text-white tracking-tight">
           {monthlyPaymentCrossoverDate ? formatDuration(monthlyPaymentCrossoverDate.totalMonths) : "Never"}
         </div>
-        <p className="text-xs text-zinc-500 mt-2">
-            When monthly ownership costs become less than renting
-        </p>
-      </div>
+      </MetricCard>
 
       <div className="flex flex-col gap-4">
-        <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800 flex-1">
-          <h4 className="text-zinc-400 text-sm font-medium mb-1">Net Worth Diff (Year {inputs.simulationYears})</h4>
-          <div className={`text-2xl font-bold ${isBuyingBetter ? 'text-green-400' : 'text-red-400'}`}>
+        <MetricCard
+            title={`Net Worth Diff (${inputs.simulationYears}Y)`}
+            icon={PiggyBank}
+            className="flex-1"
+            subtext={isBuyingBetter ? "Advantage to Buying" : "Advantage to Renting"}
+        >
+          <div className={cn(
+              "text-2xl font-bold tracking-tight",
+              isBuyingBetter ? "text-emerald-400" : "text-rose-400"
+          )}>
             {isBuyingBetter ? "+" : ""}{formatCurrency(netWorthDiff)}
           </div>
-           <p className="text-xs text-zinc-500 mt-2">
-              {isBuyingBetter ? "Buying Advantage" : "Renting Advantage"}
-          </p>
-        </div>
-        <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800 flex-1">
-          <h4 className="text-zinc-400 text-sm font-medium mb-1">Renter Inv. Contributions</h4>
-          <div className="flex flex-col gap-1 mt-2">
-             <div className="flex justify-between text-sm">
-                <span className="text-zinc-500">Initial</span>
-                <span className="text-white font-medium">{formatCurrency(summary.renterTotalInitialContribution)}</span>
-             </div>
-             <div className="flex justify-between text-sm">
-                <span className="text-zinc-500">Continuous</span>
-                <span className="text-white font-medium">{formatCurrency(summary.renterTotalContinuousContribution)}</span>
-             </div>
-          </div>
-        </div>
+        </MetricCard>
+
+        <MetricCard title="Renter Contributions" className="flex-1" icon={Wallet}>
+            <div className="space-y-1.5 mt-1">
+                <div className="flex justify-between items-center text-xs">
+                    <span className="text-zinc-500">Initial Capital</span>
+                    <span className="text-zinc-200 font-mono">{formatCurrency(summary.renterTotalInitialContribution)}</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                    <span className="text-zinc-500">Monthly Savings</span>
+                    <span className="text-zinc-200 font-mono">{formatCurrency(summary.renterTotalContinuousContribution)}</span>
+                </div>
+            </div>
+        </MetricCard>
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800 flex-1">
-          <h4 className="text-zinc-400 text-sm font-medium mb-1">Total Interest Paid</h4>
-          <div className="text-2xl font-bold text-white">
+        <MetricCard
+            title="Total Interest"
+            icon={Receipt}
+            className="flex-1"
+            subtext={`Paid over ${inputs.simulationYears} years`}
+        >
+          <div className="text-2xl font-bold text-white tracking-tight">
             {formatCurrency(summary.totalInterestPaid)}
           </div>
-          <p className="text-xs text-zinc-500 mt-2">
-              Over {inputs.simulationYears} years
-          </p>
-        </div>
-        <div className="p-6 bg-zinc-900/50 rounded-lg border border-zinc-800 flex-1">
-          <h4 className="text-zinc-400 text-sm font-medium mb-1">Renter Inv. Yield</h4>
-          <div className="flex flex-col gap-1 mt-2">
-             <div className="flex justify-between text-sm">
-                <span className="text-zinc-500">Initial</span>
-                <span className="text-white font-medium">{formatCurrency(summary.renterTotalInitialYield)}</span>
-             </div>
-             <div className="flex justify-between text-sm">
-                <span className="text-zinc-500">Continuous</span>
-                <span className="text-white font-medium">{formatCurrency(summary.renterTotalContinuousYield)}</span>
-             </div>
-          </div>
-        </div>
+        </MetricCard>
+
+        <MetricCard title="Renter Yield" className="flex-1" icon={ArrowRightLeft}>
+            <div className="space-y-1.5 mt-1">
+                <div className="flex justify-between items-center text-xs">
+                    <span className="text-zinc-500">On Initial</span>
+                    <span className="text-zinc-200 font-mono">{formatCurrency(summary.renterTotalInitialYield)}</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                    <span className="text-zinc-500">On Monthly</span>
+                    <span className="text-zinc-200 font-mono">{formatCurrency(summary.renterTotalContinuousYield)}</span>
+                </div>
+            </div>
+        </MetricCard>
       </div>
 
     </div>
