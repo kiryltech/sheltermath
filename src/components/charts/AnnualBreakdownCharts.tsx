@@ -31,14 +31,17 @@ export const AnnualBreakdownCharts = () => {
     return `$${absValue.toFixed(0)}`;
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+const OUTFLOW_NAMES = ['Rent', 'Insurance', 'Mortgage Interest', 'Property Tax', 'Maintenance', 'Home Insurance', 'PMI'];
+const INFLOW_NAMES = ['Home Appreciation', 'Portfolio Growth', 'Tax Savings'];
+
+const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
         const outflows = payload.filter((p: any) => p.dataKey && p.value > 0 && (
-            p.name.includes('(Out)') || ['Rent', 'Insurance', 'Mortgage Interest', 'Property Tax', 'Maintenance', 'Home Insurance', 'PMI'].includes(p.name)
+            p.name.includes('(Out)') || OUTFLOW_NAMES.includes(p.name)
         ));
 
         const inflows = payload.filter((p: any) => p.dataKey && p.value > 0 && (
-             p.name.includes('(In)') || ['Home Appreciation', 'Portfolio Growth', 'Tax Savings'].includes(p.name)
+             p.name.includes('(In)') || INFLOW_NAMES.includes(p.name)
         ));
 
         const totalOutflow = outflows.reduce((acc: number, curr: any) => acc + curr.value, 0);
