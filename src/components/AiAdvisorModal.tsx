@@ -6,7 +6,7 @@ import { Modal } from './ui/Modal';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { callGemini } from '@/lib/ai/gemini';
 import { generateAnalysisPrompt } from '@/lib/ai/prompt';
-import { Bot, Key, Loader2, AlertCircle, Copy, Check, FileText } from 'lucide-react';
+import { Bot, Key, Loader2, AlertCircle, Copy, Check, FileText, Baby } from 'lucide-react';
 import { Checkbox } from './ui/Checkbox';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +26,7 @@ export const AiAdvisorModal: React.FC<AiAdvisorModalProps> = ({ isOpen, onClose 
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [isPromptCopied, setIsPromptCopied] = useState(false);
+  const [showToddlerInfo, setShowToddlerInfo] = useState(false);
 
   const { inputs, results } = useSimulationStore();
 
@@ -85,6 +86,7 @@ export const AiAdvisorModal: React.FC<AiAdvisorModalProps> = ({ isOpen, onClose 
     setError('');
     setShowPromptPreview(false);
     setGeneratedPrompt('');
+    setShowToddlerInfo(false);
   };
 
   const copyToClipboard = async (text: string, isPrompt: boolean = false) => {
@@ -100,6 +102,15 @@ export const AiAdvisorModal: React.FC<AiAdvisorModalProps> = ({ isOpen, onClose 
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
+  };
+
+  const handleToddlerMode = async () => {
+      try {
+          await navigator.clipboard.writeText(result);
+          setShowToddlerInfo(true);
+      } catch (err) {
+          console.error('Failed to copy text for toddler mode: ', err);
+      }
   };
 
   return (
@@ -242,15 +253,46 @@ export const AiAdvisorModal: React.FC<AiAdvisorModalProps> = ({ isOpen, onClose 
                       <Bot className="w-6 h-6 text-indigo-400" />
                       <h3 className="text-lg font-medium text-white">Advisor Analysis</h3>
                   </div>
-                  <button
-                    onClick={() => copyToClipboard(result)}
-                    className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors flex items-center gap-2 text-sm"
-                    title="Copy Analysis"
-                  >
-                    {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    <span className="hidden sm:inline">{isCopied ? 'Copied' : 'Copy'}</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleToddlerMode}
+                        className="p-2 text-zinc-400 hover:text-indigo-400 hover:bg-zinc-800 rounded-lg transition-colors flex items-center gap-2 text-sm"
+                        title="Generate Bedtime Story"
+                    >
+                        <Baby className="w-4 h-4" />
+                        <span className="hidden sm:inline">Toddler Mode (Experimental)</span>
+                    </button>
+                    <button
+                        onClick={() => copyToClipboard(result)}
+                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors flex items-center gap-2 text-sm"
+                        title="Copy Analysis"
+                    >
+                        {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        <span className="hidden sm:inline">{isCopied ? 'Copied' : 'Copy'}</span>
+                    </button>
+                  </div>
                </div>
+               {showToddlerInfo && (
+                   <div className="mb-4 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-start gap-4 animate-in fade-in slide-in-from-top-2">
+                       <div className="p-2 bg-indigo-500/20 rounded-full flex-shrink-0">
+                           <Baby className="w-5 h-5 text-indigo-400" />
+                       </div>
+                       <div className="flex-1 space-y-2">
+                           <div>
+                               <h4 className="text-sm font-medium text-indigo-200">Report copied! Ready for storytelling</h4>
+                               <p className="text-sm text-zinc-400 mt-1">
+                                   Paste the report into <a href="https://gemini.google.com/gem/storybook" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-medium">Gemini Storybook</a> to generate a personalized bedtime story explaining these financial concepts.
+                               </p>
+                           </div>
+                           <button
+                                onClick={() => setShowToddlerInfo(false)}
+                                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                           >
+                               Dismiss
+                           </button>
+                       </div>
+                   </div>
+               )}
                <div className="text-zinc-300 text-sm">
                   <ReactMarkdown
                     components={{
