@@ -29,6 +29,12 @@ export interface SimulationParams {
   incomeGrowthRate?: number; // Defaults to inflationRate if not provided
   itemizedDeductionRate?: number; // 0 to 100% of potential deductions claimed (default 0)
 
+  // Lifestyle
+  monthlyCarPayment: number; // 5-year loan cycle
+  monthlyCarInsuranceGasMaintenance: number;
+  monthlyFoodAndEssentials: number;
+  monthlyUtilities: number;
+
   // Simulation
   simulationYears: number;
   inflationAdjusted?: boolean;
@@ -107,8 +113,18 @@ export interface MonthlyCashFlow {
   // Income & Ratios
   grossIncome: number;
   netIncome: number;
-  lifestyleBudgetRenter: number;
-  lifestyleBudgetOwner: number;
+
+  // Lifestyle Breakdown
+  carPayment: number;
+  carInsuranceGasMaintenance: number;
+  foodAndEssentials: number;
+  utilities: number;
+  totalLifestyleExpenses: number;
+  remainingDiscretionaryRenter: number;
+  remainingDiscretionaryOwner: number;
+
+  lifestyleBudgetRenter: number; // Keeping for backward compatibility/total budget view
+  lifestyleBudgetOwner: number; // Keeping for backward compatibility/total budget view
   housingIncomeRatioOwner: number;
   housingIncomeRatioRenter: number;
 }

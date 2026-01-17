@@ -143,4 +143,47 @@ describe('simulateTimeline', () => {
 
     expect(totalComponents).toBeCloseTo(summary.finalRenterNetWorth, 0);
   });
+
+  it('calculates lifestyle expenses correctly', () => {
+    // 5% inflation, $500 car payment, $300 insurance
+    const params: SimulationParams = {
+        ...defaultParams,
+        inflationRate: 5.0,
+        monthlyCarPayment: 500,
+        monthlyCarInsuranceGasMaintenance: 300,
+        monthlyFoodAndEssentials: 0,
+        monthlyUtilities: 0,
+        simulationYears: 10
+    };
+
+    const result = simulateTimeline(params);
+    const m1 = result.monthlyData[0];   // Month 1
+    const m60 = result.monthlyData[59]; // Month 60 (End of cycle 1)
+    const m61 = result.monthlyData[60]; // Month 61 (Start of cycle 2)
+
+    // Car Payment should be constant nominal for first 60 months
+    expect(m1.carPayment).toBeCloseTo(500, 2);
+    expect(m60.carPayment).toBeCloseTo(500, 2);
+
+    // Month 61: New car purchased at inflated price.
+    // Inflation over 5 years (60 months).
+    // Formula in code: monthlyRate = (1.05)^(1/12) - 1.
+    // Factor = (1+monthlyRate)^60 = 1.05^5 approx 1.276
+    const expectedFactor = Math.pow(1.05, 5);
+    const expectedNewPayment = 500 * expectedFactor;
+
+    // Note: Our test logic uses calculateMonthlyGeometricRate which is precise.
+    // 1.05^5 is 1.27628...
+    expect(m61.carPayment).toBeCloseTo(expectedNewPayment, 2);
+    expect(m61.carPayment).toBeGreaterThan(m60.carPayment);
+
+    // Insurance should grow continuously
+    // Month 1 should be slightly inflated from base?
+    // Code: nominal = base * (1+r)^month
+    // m1: 300 * (1+r)^1
+    expect(m1.carInsuranceGasMaintenance).toBeGreaterThan(300);
+
+    // m60 should be significantly higher
+    expect(m60.carInsuranceGasMaintenance).toBeGreaterThan(m1.carInsuranceGasMaintenance);
+  });
 });

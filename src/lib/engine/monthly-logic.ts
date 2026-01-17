@@ -1,4 +1,5 @@
 import { MonthlyCashFlow, OwnerMonthlyState, RenterMonthlyState, SimulationParams } from './types';
+import { calculateMonthlyGeometricRate } from './utils';
 
 export interface MonthlyFinancialsInput {
   params: SimulationParams;
@@ -45,11 +46,17 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
     inflationAdjusted = false,
     federalTaxRate,
     stateTaxRate,
-    itemizedDeductionRate = 0
+    itemizedDeductionRate = 0,
+    inflationRate,
+    monthlyCarPayment = 500,
+    monthlyCarInsuranceGasMaintenance = 300,
+    monthlyFoodAndEssentials = 600,
+    monthlyUtilities = 200
   } = params;
 
   // Discount Factor
   const discountFactor = inflationAdjusted ? (1 / Math.pow(1 + monthlyDiscountRate, month)) : 1;
+  const monthlyInflationRate = calculateMonthlyGeometricRate(inflationRate);
 
   // --- Tax Deduction Logic (Approximation) ---
   // We assume the user itemizes if they have a mortgage.
@@ -113,10 +120,28 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
   // Net Income (excluding the tax savings, which effectively reduce the housing cost)
   const monthlyNetIncome = (currentGrossIncome / 12) - monthlyTax;
 
+  // --- Lifestyle Expenses Calculation ---
+  // Car Payment: Fixed for 5 years (60 months), then resets to inflation-adjusted base.
+  // We assume the user buys a new car every 5 years.
+  const carCycleIndex = Math.floor((month - 1) / 60);
+  const carInflationFactor = Math.pow(1 + monthlyInflationRate, carCycleIndex * 60);
+  const nominalCarPayment = monthlyCarPayment * carInflationFactor;
+
+  // Other expenses grow continuously with inflation
+  const generalInflationFactor = Math.pow(1 + monthlyInflationRate, month);
+  const nominalCarInsurance = monthlyCarInsuranceGasMaintenance * generalInflationFactor;
+  const nominalFood = monthlyFoodAndEssentials * generalInflationFactor;
+  const nominalUtilities = monthlyUtilities * generalInflationFactor;
+
+  const nominalTotalLifestyle = nominalCarPayment + nominalCarInsurance + nominalFood + nominalUtilities;
+
   // Budget: For Owner, we use the ADJUSTED outflow.
   // Note: We don't add taxSavings to income; we subtracted it from the "Bill". Same net effect.
   const lifestyleBudgetOwner = monthlyNetIncome - adjustedOwnerOutflow - ownerContribution;
   const lifestyleBudgetRenter = monthlyNetIncome - renter.totalOutflow - renterContribution;
+
+  const remainingDiscretionaryOwner = lifestyleBudgetOwner - nominalTotalLifestyle;
+  const remainingDiscretionaryRenter = lifestyleBudgetRenter - nominalTotalLifestyle;
 
   const housingIncomeRatioOwner = (adjustedOwnerOutflow / (currentGrossIncome / 12)) * 100;
   const housingIncomeRatioRenter = (renter.totalOutflow / (currentGrossIncome / 12)) * 100;
@@ -141,6 +166,16 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
       renterNetWorth: renterNetWorth * discountFactor,
       grossIncome: (currentGrossIncome / 12) * discountFactor,
       netIncome: monthlyNetIncome * discountFactor,
+
+      // Lifestyle Breakdown (Discounted)
+      carPayment: nominalCarPayment * discountFactor,
+      carInsuranceGasMaintenance: nominalCarInsurance * discountFactor,
+      foodAndEssentials: nominalFood * discountFactor,
+      utilities: nominalUtilities * discountFactor,
+      totalLifestyleExpenses: nominalTotalLifestyle * discountFactor,
+      remainingDiscretionaryOwner: remainingDiscretionaryOwner * discountFactor,
+      remainingDiscretionaryRenter: remainingDiscretionaryRenter * discountFactor,
+
       lifestyleBudgetRenter: lifestyleBudgetRenter * discountFactor,
       lifestyleBudgetOwner: lifestyleBudgetOwner * discountFactor,
       housingIncomeRatioOwner,

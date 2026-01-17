@@ -18,6 +18,12 @@ export function generateAnalysisPrompt(inputs: SimulationParams, results: Simula
 - State Tax Rate: ${formatPercent(inputs.stateTaxRate)}
 - Income Growth Rate: ${formatPercent(inputs.incomeGrowthRate ?? inputs.inflationRate)}
 
+**Lifestyle:**
+- Monthly Car Payment: ${formatCurrency(inputs.monthlyCarPayment)} (Resets every 5 years)
+- Monthly Car Insurance/Gas: ${formatCurrency(inputs.monthlyCarInsuranceGasMaintenance)}
+- Monthly Food/Essentials: ${formatCurrency(inputs.monthlyFoodAndEssentials)}
+- Monthly Utilities: ${formatCurrency(inputs.monthlyUtilities)}
+
 **Housing (Buy):**
 - Home Price: ${formatCurrency(inputs.homePrice)}
 - Down Payment: ${inputs.downPaymentPercentage}%
@@ -77,6 +83,7 @@ Things to pay close attention to:
 3. Initial lump sum, compare to annual income, acknowledge a good savings habit if you see it.
 4. Overall preparedness for retirement (in 30-35 years of the purchase).
 5. Review the lifestyle budget and remember that essentials like food are still non optional and come out of that budget.
+6. Make these numbers explicit in the analysis. Note that it is expected that once car loan is paid off (5 year cycle), the renter / owner is buying a new car. Analyze if those liabilities are reasonable or not.
 
 With this in mind please review this report dataset:
 

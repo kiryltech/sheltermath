@@ -11,22 +11,59 @@ const formatCurrency = (value: number) => {
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
+    // Helper to find value by dataKey
+    const getValue = (key: string) => payload.find((p: any) => p.dataKey === key)?.value || 0;
+
+    const carPayment = getValue('carPayment');
+    const carInsurance = getValue('carInsurance');
+    const food = getValue('food');
+    const utilities = getValue('utilities');
+    const totalExpenses = carPayment + carInsurance + food + utilities;
+
+    const ownerBudget = getValue('ownerBudget');
+    const renterBudget = getValue('renterBudget');
+
+    const ownerDiscretionary = ownerBudget - totalExpenses;
+    const renterDiscretionary = renterBudget - totalExpenses;
+
+    const format = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
+
     return (
-      <div className="bg-surface-dark border border-white/10 p-3 rounded-lg shadow-xl backdrop-blur-md">
+      <div className="bg-surface-dark border border-white/10 p-3 rounded-lg shadow-xl backdrop-blur-md min-w-[220px]">
         <p className="text-zinc-400 text-xs mb-2">Year {label}</p>
-        <div className="space-y-1">
-          {payload.map((entry: any) => (
-            <div key={entry.name} className="flex items-center gap-2 text-sm">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="text-zinc-300 w-24">{entry.name}:</span>
-              <span className="font-mono text-white">
-                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(entry.value)}
-              </span>
+
+        {/* Expenses Group */}
+        <div className="mb-3 pb-3 border-b border-white/5 space-y-1">
+             <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Expenses</div>
+             <div className="flex justify-between text-sm"><span style={{color: '#ef4444'}}>Car Payment:</span> <span className="text-white font-mono">{format(carPayment)}</span></div>
+             <div className="flex justify-between text-sm"><span style={{color: '#eab308'}}>Insurance & Gas:</span> <span className="text-white font-mono">{format(carInsurance)}</span></div>
+             <div className="flex justify-between text-sm"><span style={{color: '#10b981'}}>Food & Essentials:</span> <span className="text-white font-mono">{format(food)}</span></div>
+             <div className="flex justify-between text-sm"><span style={{color: '#6366f1'}}>Utilities:</span> <span className="text-white font-mono">{format(utilities)}</span></div>
+             <div className="flex justify-between text-sm pt-1 border-t border-white/5 font-bold"><span className="text-zinc-300">Total Expenses:</span> <span className="text-white font-mono">{format(totalExpenses)}</span></div>
+        </div>
+
+        {/* Budgets Group */}
+        <div className="space-y-3">
+            <div>
+                 <div className="flex justify-between text-sm font-bold" style={{color: '#f97316'}}>
+                    <span>Owner Budget:</span>
+                    <span className="font-mono">{format(ownerBudget)}</span>
+                 </div>
+                 <div className="flex justify-between text-xs text-zinc-400 pl-2">
+                    <span>Remaining:</span>
+                    <span className={ownerDiscretionary < 0 ? 'text-red-400 font-mono' : 'text-green-400 font-mono'}>{format(ownerDiscretionary)}</span>
+                 </div>
             </div>
-          ))}
+            <div>
+                 <div className="flex justify-between text-sm font-bold" style={{color: '#22d3ee'}}>
+                    <span>Renter Budget:</span>
+                    <span className="font-mono">{format(renterBudget)}</span>
+                 </div>
+                 <div className="flex justify-between text-xs text-zinc-400 pl-2">
+                    <span>Remaining:</span>
+                    <span className={renterDiscretionary < 0 ? 'text-red-400 font-mono' : 'text-green-400 font-mono'}>{format(renterDiscretionary)}</span>
+                 </div>
+            </div>
         </div>
       </div>
     );
@@ -44,8 +81,12 @@ export const LifestyleBudgetChart = () => {
         const d = results.monthlyData[i];
         sampled.push({
             year: d.year,
-            Owner: d.lifestyleBudgetOwner,
-            Renter: d.lifestyleBudgetRenter,
+            ownerBudget: d.lifestyleBudgetOwner,
+            renterBudget: d.lifestyleBudgetRenter,
+            carPayment: d.carPayment,
+            carInsurance: d.carInsuranceGasMaintenance,
+            food: d.foodAndEssentials,
+            utilities: d.utilities
         });
     }
     return sampled;
@@ -56,29 +97,20 @@ export const LifestyleBudgetChart = () => {
       <div className="mb-6">
         <h3 className="text-lg font-bold text-white flex items-center gap-2">
             <span className="material-symbols-outlined text-zinc-500">account_balance_wallet</span>
-            Monthly Lifestyle Budget
+            Lifestyle Breakdown
         </h3>
         <p className="text-sm text-zinc-400 mt-1">
-          Monthly income remaining after taxes and housing costs. This covers all essentials (food, transport) and discretionary spending (investments, entertainment, vacations).
+          Comparison of total monthly budget (Net Income - Housing Costs) against projected lifestyle expenses.
+          The solid area represents unavoidable expenses; the lines show total available budget.
         </p>
       </div>
 
-      <div className="h-[300px] w-full">
+      <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
             margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
           >
-            <defs>
-              <linearGradient id="colorBudgetBuy" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
-              </linearGradient>
-              <linearGradient id="colorBudgetRent" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#22d3ee" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
             <XAxis
               dataKey="year"
@@ -97,23 +129,61 @@ export const LifestyleBudgetChart = () => {
             />
             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)' }} />
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
+
+            {/* Stacked Expenses */}
             <Area
               type="monotone"
-              dataKey="Owner"
-              stroke="#f97316"
-              strokeWidth={2}
-              fillOpacity={1}
-              fill="url(#colorBudgetBuy)"
-              name="Owner"
+              dataKey="utilities"
+              stackId="expenses"
+              stroke="#6366f1"
+              fill="#6366f1"
+              fillOpacity={0.6}
+              name="Utilities"
             />
             <Area
               type="monotone"
-              dataKey="Renter"
+              dataKey="food"
+              stackId="expenses"
+              stroke="#10b981"
+              fill="#10b981"
+              fillOpacity={0.6}
+              name="Food & Essentials"
+            />
+             <Area
+              type="monotone"
+              dataKey="carInsurance"
+              stackId="expenses"
+              stroke="#eab308"
+              fill="#eab308"
+              fillOpacity={0.6}
+              name="Car Ins & Gas"
+            />
+            <Area
+              type="monotone"
+              dataKey="carPayment"
+              stackId="expenses"
+              stroke="#ef4444"
+              fill="#ef4444"
+              fillOpacity={0.6}
+              name="Car Payment"
+            />
+
+            {/* Budget Lines (Transparent Areas) */}
+            <Area
+              type="monotone"
+              dataKey="ownerBudget"
+              stroke="#f97316"
+              strokeWidth={3}
+              fill="none"
+              name="Available (Owner)"
+            />
+            <Area
+              type="monotone"
+              dataKey="renterBudget"
               stroke="#22d3ee"
-              strokeWidth={2}
-              fillOpacity={1}
-              fill="url(#colorBudgetRent)"
-              name="Renter"
+              strokeWidth={3}
+              fill="none"
+              name="Available (Renter)"
             />
           </AreaChart>
         </ResponsiveContainer>
