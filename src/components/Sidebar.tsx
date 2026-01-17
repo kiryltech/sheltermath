@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X, DollarSign, CircleHelp, Wallet, Receipt, PiggyBank } from 'lucide-react';
+import { Home, Building2, TrendingUp, ChevronDown, ChevronRight, Menu, X, DollarSign, CircleHelp, Wallet, Receipt, PiggyBank, Car } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { SimulationInputGroup } from './SimulationInputGroup';
 import { Checkbox } from './ui/Checkbox';
@@ -254,6 +254,17 @@ export const Sidebar = () => {
                 prefix="$"
                 inputClassName="w-24"
             />
+            <SimulationInputGroup
+                label="Dining Out"
+                tooltip="Monthly budget for dining out and restaurants. Grows with inflation."
+                value={inputs.monthlyDineOut ?? 200}
+                onChange={update('monthlyDineOut')}
+                min={0}
+                max={5000}
+                step={25}
+                prefix="$"
+                inputClassName="w-24"
+            />
         </SidebarSection>
 
         {/* Group 3: Recurring Home Costs */}
@@ -361,7 +372,55 @@ export const Sidebar = () => {
             />
         </SidebarSection>
 
-        {/* Group 5: Market Assumptions */}
+        {/* Group 5: Lifestyle Expenses */}
+        <SidebarSection title="Lifestyle Expenses" icon={Car}>
+             <SimulationInputGroup
+                label="Car Payment"
+                tooltip="Monthly car payment. Resets to inflation-adjusted amount every 5 years (new car purchase)."
+                value={inputs.monthlyCarPayment}
+                onChange={update('monthlyCarPayment')}
+                min={0}
+                max={5000}
+                step={50}
+                prefix="$"
+                inputClassName="w-24"
+            />
+            <SimulationInputGroup
+                label="Car Insurance & Gas"
+                tooltip="Monthly cost for car insurance, gas, and maintenance. Grows with inflation."
+                value={inputs.monthlyCarInsuranceGasMaintenance}
+                onChange={update('monthlyCarInsuranceGasMaintenance')}
+                min={0}
+                max={2000}
+                step={25}
+                prefix="$"
+                inputClassName="w-24"
+            />
+            <SimulationInputGroup
+                label="Food & Essentials"
+                tooltip="Monthly cost for food, groceries, and other essentials. Grows with inflation."
+                value={inputs.monthlyFoodAndEssentials}
+                onChange={update('monthlyFoodAndEssentials')}
+                min={0}
+                max={5000}
+                step={50}
+                prefix="$"
+                inputClassName="w-24"
+            />
+            <SimulationInputGroup
+                label="Utilities"
+                tooltip="Monthly cost for utilities (Electricity, Water, Internet, etc). Grows with inflation."
+                value={inputs.monthlyUtilities}
+                onChange={update('monthlyUtilities')}
+                min={0}
+                max={2000}
+                step={25}
+                prefix="$"
+                inputClassName="w-24"
+            />
+        </SidebarSection>
+
+        {/* Group 6: Market Assumptions */}
         <SidebarSection title="Market Assumptions" icon={TrendingUp}>
             <SimulationInputGroup
                 label="Home Appreciation"
@@ -449,7 +508,7 @@ export const Sidebar = () => {
             />
         </SidebarSection>
 
-        {/* Group 6: Savings Strategy */}
+        {/* Group 7: Savings Strategy */}
         <SidebarSection title="Savings Strategy" icon={PiggyBank}>
              <SimulationInputGroup
                 label="Renter Invests Surplus"
