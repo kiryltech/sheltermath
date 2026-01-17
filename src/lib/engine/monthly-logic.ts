@@ -51,7 +51,8 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
     monthlyCarPayment = 500,
     monthlyCarInsuranceGasMaintenance = 300,
     monthlyFoodAndEssentials = 600,
-    monthlyUtilities = 200
+    monthlyUtilities = 200,
+    monthlyDineOut = 200
   } = params;
 
   // Discount Factor
@@ -132,8 +133,9 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
   const nominalCarInsurance = monthlyCarInsuranceGasMaintenance * generalInflationFactor;
   const nominalFood = monthlyFoodAndEssentials * generalInflationFactor;
   const nominalUtilities = monthlyUtilities * generalInflationFactor;
+  const nominalDineOut = monthlyDineOut * generalInflationFactor;
 
-  const nominalTotalLifestyle = nominalCarPayment + nominalCarInsurance + nominalFood + nominalUtilities;
+  const nominalTotalLifestyle = nominalCarPayment + nominalCarInsurance + nominalFood + nominalUtilities + nominalDineOut;
 
   // Budget: For Owner, we use the ADJUSTED outflow.
   // Note: We don't add taxSavings to income; we subtracted it from the "Bill". Same net effect.
@@ -172,6 +174,7 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
       carInsuranceGasMaintenance: nominalCarInsurance * discountFactor,
       foodAndEssentials: nominalFood * discountFactor,
       utilities: nominalUtilities * discountFactor,
+      dineOut: nominalDineOut * discountFactor,
       totalLifestyleExpenses: nominalTotalLifestyle * discountFactor,
       remainingDiscretionaryOwner: remainingDiscretionaryOwner * discountFactor,
       remainingDiscretionaryRenter: remainingDiscretionaryRenter * discountFactor,

@@ -18,7 +18,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const carInsurance = getValue('carInsurance');
     const food = getValue('food');
     const utilities = getValue('utilities');
-    const totalExpenses = carPayment + carInsurance + food + utilities;
+    const dineOut = getValue('dineOut');
+    const totalExpenses = carPayment + carInsurance + food + utilities + dineOut;
 
     const ownerBudget = getValue('ownerBudget');
     const renterBudget = getValue('renterBudget');
@@ -38,6 +39,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
              <div className="flex justify-between text-sm"><span style={{color: '#ef4444'}}>Car Payment:</span> <span className="text-white font-mono">{format(carPayment)}</span></div>
              <div className="flex justify-between text-sm"><span style={{color: '#eab308'}}>Insurance & Gas:</span> <span className="text-white font-mono">{format(carInsurance)}</span></div>
              <div className="flex justify-between text-sm"><span style={{color: '#10b981'}}>Food & Essentials:</span> <span className="text-white font-mono">{format(food)}</span></div>
+             <div className="flex justify-between text-sm"><span style={{color: '#a855f7'}}>Dining Out:</span> <span className="text-white font-mono">{format(dineOut)}</span></div>
              <div className="flex justify-between text-sm"><span style={{color: '#6366f1'}}>Utilities:</span> <span className="text-white font-mono">{format(utilities)}</span></div>
              <div className="flex justify-between text-sm pt-1 border-t border-white/5 font-bold"><span className="text-zinc-300">Total Expenses:</span> <span className="text-white font-mono">{format(totalExpenses)}</span></div>
         </div>
@@ -86,7 +88,8 @@ export const LifestyleBudgetChart = () => {
             carPayment: d.carPayment,
             carInsurance: d.carInsuranceGasMaintenance,
             food: d.foodAndEssentials,
-            utilities: d.utilities
+            utilities: d.utilities,
+            dineOut: d.dineOut
         });
     }
     return sampled;
@@ -139,6 +142,15 @@ export const LifestyleBudgetChart = () => {
               fill="#6366f1"
               fillOpacity={0.6}
               name="Utilities"
+            />
+             <Area
+              type="monotone"
+              dataKey="dineOut"
+              stackId="expenses"
+              stroke="#a855f7"
+              fill="#a855f7"
+              fillOpacity={0.6}
+              name="Dining Out"
             />
             <Area
               type="monotone"

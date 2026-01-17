@@ -34,6 +34,7 @@ export interface SimulationParams {
   monthlyCarInsuranceGasMaintenance: number;
   monthlyFoodAndEssentials: number;
   monthlyUtilities: number;
+  monthlyDineOut: number;
 
   // Simulation
   simulationYears: number;
@@ -119,6 +120,7 @@ export interface MonthlyCashFlow {
   carInsuranceGasMaintenance: number;
   foodAndEssentials: number;
   utilities: number;
+  dineOut: number;
   totalLifestyleExpenses: number;
   remainingDiscretionaryRenter: number;
   remainingDiscretionaryOwner: number;

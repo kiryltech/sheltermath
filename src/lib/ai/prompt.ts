@@ -22,6 +22,7 @@ export function generateAnalysisPrompt(inputs: SimulationParams, results: Simula
 - Monthly Car Payment: ${formatCurrency(inputs.monthlyCarPayment)} (Resets every 5 years)
 - Monthly Car Insurance/Gas: ${formatCurrency(inputs.monthlyCarInsuranceGasMaintenance)}
 - Monthly Food/Essentials: ${formatCurrency(inputs.monthlyFoodAndEssentials)}
+- Monthly Dining Out: ${formatCurrency(inputs.monthlyDineOut)}
 - Monthly Utilities: ${formatCurrency(inputs.monthlyUtilities)}
 
 **Housing (Buy):**

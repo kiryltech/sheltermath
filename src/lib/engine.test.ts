@@ -37,7 +37,12 @@ describe('simulateTimeline', () => {
     grossIncome: 120000,
     federalTaxRate: 22,
     stateTaxRate: 5,
-    incomeGrowthRate: 3.0
+    incomeGrowthRate: 3.0,
+    monthlyCarPayment: 500,
+    monthlyCarInsuranceGasMaintenance: 300,
+    monthlyFoodAndEssentials: 600,
+    monthlyUtilities: 200,
+    monthlyDineOut: 200
   };
 
   it('generates correct number of months', () => {

@@ -41,6 +41,7 @@ export const DEFAULT_INPUTS: SimulationParams = {
   monthlyCarInsuranceGasMaintenance: 300,
   monthlyFoodAndEssentials: 600,
   monthlyUtilities: 200,
+  monthlyDineOut: 200,
 };
 
 export const useSimulationStore = create<SimulationState>((set) => ({

@@ -254,6 +254,17 @@ export const Sidebar = () => {
                 prefix="$"
                 inputClassName="w-24"
             />
+            <SimulationInputGroup
+                label="Dining Out"
+                tooltip="Monthly budget for dining out and restaurants. Grows with inflation."
+                value={inputs.monthlyDineOut ?? 200}
+                onChange={update('monthlyDineOut')}
+                min={0}
+                max={5000}
+                step={25}
+                prefix="$"
+                inputClassName="w-24"
+            />
         </SidebarSection>
 
         {/* Group 3: Recurring Home Costs */}
