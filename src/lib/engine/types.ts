@@ -26,6 +26,7 @@ export interface SimulationParams {
   grossIncome: number;
   federalTaxRate: number;
   stateTaxRate: number;
+  contribution401k: number; // Annual 401k contribution (starts at this value, grows with income)
   incomeGrowthRate?: number; // Defaults to inflationRate if not provided
   itemizedDeductionRate?: number; // 0 to 100% of potential deductions claimed (default 0)
 

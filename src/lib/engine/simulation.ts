@@ -7,7 +7,7 @@ import { initializeYearFlows, accumulateAnnualFlows } from './aggregator';
  * Simulates the timeline for Buying vs Renting.
  */
 export function simulateTimeline(params: SimulationParams): SimulationResult {
-  const { simulationYears, grossIncome } = params;
+  const { simulationYears, grossIncome, contribution401k } = params;
 
   // 1. Setup Phase
   const {
@@ -21,6 +21,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
 
   // 2. Initialization Phase
   let currentGrossIncome = grossIncome;
+  let currentAnnual401k = contribution401k;
   let ownerInvestmentPortfolio = 0;
   let renterInvestmentPortfolio = downPayment; // Renter invests the down payment
 
@@ -66,6 +67,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
           owner,
           renter,
           currentGrossIncome,
+          currentAnnual401k,
           ownerInvestmentPortfolio,
           renterInvestmentPortfolio,
           monthlyInvestmentReturn,
@@ -108,6 +110,7 @@ export function simulateTimeline(params: SimulationParams): SimulationResult {
 
       // Grow Income
       currentGrossIncome *= (1 + monthlyIncomeGrowth);
+      currentAnnual401k *= (1 + monthlyIncomeGrowth);
 
       // Check Crossovers
       const { ownerNetWorth, renterNetWorth, totalOwnerOutflow, totalRenterOutflow } = result.monthlyData; // These are discounted values

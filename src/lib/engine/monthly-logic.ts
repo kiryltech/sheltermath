@@ -7,6 +7,7 @@ export interface MonthlyFinancialsInput {
   owner: OwnerMonthlyState;
   renter: RenterMonthlyState;
   currentGrossIncome: number;
+  currentAnnual401k: number;
   ownerInvestmentPortfolio: number;
   renterInvestmentPortfolio: number;
   monthlyInvestmentReturn: number;
@@ -33,6 +34,7 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
     owner,
     renter,
     currentGrossIncome,
+    currentAnnual401k,
     ownerInvestmentPortfolio,
     renterInvestmentPortfolio,
     monthlyInvestmentReturn,
@@ -72,27 +74,43 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
   // The "Real" cost of owning is the cash outflow minus the tax money you didn't have to pay.
   const adjustedOwnerOutflow = owner.totalOutflow - taxSavings;
 
-  // Difference
+  // 401k Logic
+  const monthly401k = currentAnnual401k / 12;
+  const taxableGrossIncomeMonthly = (currentGrossIncome / 12) - monthly401k;
+  const monthlyTax = taxableGrossIncomeMonthly * ((federalTaxRate + stateTaxRate) / 100);
+  // Net Income (excluding the tax savings, which effectively reduce the housing cost)
+  // This is "Take Home" pay after Tax and 401k
+  const monthlyNetIncome = (currentGrossIncome / 12) - monthlyTax - monthly401k;
+
+  // Difference (Calculated using Post-Tax Post-401k money)
+  // Logic: Both have `monthlyNetIncome` to spend.
+  // Owner spends `adjustedOwnerOutflow`. Renter spends `renter.totalOutflow`.
+  // The difference determines who has MORE disposable income (surplus) to invest.
   const diff = adjustedOwnerOutflow - renter.totalOutflow;
-  let investedAmount = 0;
-  let renterContribution = 0;
-  let ownerContribution = 0;
+  let surplusInvested = 0;
+  let renterSurplusContribution = 0;
+  let ownerSurplusContribution = 0;
 
   let currentRenterPortfolio = renterInvestmentPortfolio;
   let currentOwnerPortfolio = ownerInvestmentPortfolio;
 
+  // Add 401k to portfolios immediately (it's pre-tax savings)
+  currentRenterPortfolio += monthly401k;
+  currentOwnerPortfolio += monthly401k;
+
   if (diff > 0) {
       // Renter saves (Owner spends more)
+      // Since Owner costs > Renter costs, Renter has 'diff' more cash available from Net Income.
       const savings = diff;
-      investedAmount = savings * (renterDiscipline / 100);
-      currentRenterPortfolio += investedAmount;
-      renterContribution = investedAmount;
+      surplusInvested = savings * (renterDiscipline / 100);
+      currentRenterPortfolio += surplusInvested;
+      renterSurplusContribution = surplusInvested;
   } else {
       // Owner saves (Renter spends more)
       const savings = -diff;
-      investedAmount = savings * (ownerDiscipline / 100);
-      currentOwnerPortfolio += investedAmount;
-      ownerContribution = investedAmount;
+      surplusInvested = savings * (ownerDiscipline / 100);
+      currentOwnerPortfolio += surplusInvested;
+      ownerSurplusContribution = surplusInvested;
   }
 
   // Growth
@@ -108,15 +126,11 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
   const ownerNetWorth = owner.realizableEquity + currentOwnerPortfolio;
   const renterNetWorth = currentRenterPortfolio;
 
-  // Income & Budget Calculations
-  const monthlyTax = currentGrossIncome * ((federalTaxRate + stateTaxRate) / 100) / 12;
-  // Net Income (excluding the tax savings, which effectively reduce the housing cost)
-  const monthlyNetIncome = (currentGrossIncome / 12) - monthlyTax;
-
   // Budget: For Owner, we use the ADJUSTED outflow.
   // Note: We don't add taxSavings to income; we subtracted it from the "Bill". Same net effect.
-  const lifestyleBudgetOwner = monthlyNetIncome - adjustedOwnerOutflow - ownerContribution;
-  const lifestyleBudgetRenter = monthlyNetIncome - renter.totalOutflow - renterContribution;
+  // 401k is already deducted from monthlyNetIncome, so we only subtract the surplus contribution.
+  const lifestyleBudgetOwner = monthlyNetIncome - adjustedOwnerOutflow - ownerSurplusContribution;
+  const lifestyleBudgetRenter = monthlyNetIncome - renter.totalOutflow - renterSurplusContribution;
 
   const housingIncomeRatioOwner = (adjustedOwnerOutflow / (currentGrossIncome / 12)) * 100;
   const housingIncomeRatioRenter = (renter.totalOutflow / (currentGrossIncome / 12)) * 100;
@@ -136,7 +150,7 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
       rentersInsurance: renter.rentersInsurance * discountFactor,
       totalRenterOutflow: renter.totalOutflow * discountFactor,
       savings: Math.abs(diff) * discountFactor,
-      investedAmount: investedAmount * discountFactor,
+      investedAmount: surplusInvested * discountFactor,
       ownerNetWorth: ownerNetWorth * discountFactor,
       renterNetWorth: renterNetWorth * discountFactor,
       grossIncome: (currentGrossIncome / 12) * discountFactor,
@@ -151,8 +165,8 @@ export function calculateMonthlyFinancials(input: MonthlyFinancialsInput): Month
     monthlyData,
     newOwnerPortfolio: currentOwnerPortfolio,
     newRenterPortfolio: currentRenterPortfolio,
-    ownerContribution,
-    renterContribution,
+    ownerContribution: ownerSurplusContribution + monthly401k,
+    renterContribution: renterSurplusContribution + monthly401k,
     ownerPortfolioGrowth,
     renterPortfolioGrowth,
     taxSavings: taxSavings * discountFactor,

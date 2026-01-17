@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useSimulationStore } from '@/store/useSimulationStore';
-import { TrendingUp, Wallet, PiggyBank, Receipt, Scale, ArrowRightLeft } from 'lucide-react';
+import { TrendingUp, Wallet, PiggyBank, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MetricCardProps {
@@ -59,79 +59,47 @@ export const SummaryMetrics = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full mb-8">
 
       <MetricCard
-        title="Equity Crossover"
-        icon={TrendingUp}
-        subtext="When buying beats renting net worth"
+        title="Owner Net Worth"
+        icon={Home}
+        subtext={`Total value after ${inputs.simulationYears} years`}
       >
-        <div className="text-3xl font-bold text-white tracking-tight">
-          {crossoverDate ? formatDuration(crossoverDate.totalMonths) : "Never"}
+        <div className="text-2xl font-bold text-white tracking-tight">
+          {formatCurrency(summary.finalOwnerNetWorth)}
         </div>
       </MetricCard>
 
       <MetricCard
-        title="Monthly Break-Even"
-        icon={Scale}
-        subtext="When owning costs less monthly"
+        title="Renter Net Worth"
+        icon={Wallet}
+        subtext={`Total value after ${inputs.simulationYears} years`}
       >
-        <div className="text-3xl font-bold text-white tracking-tight">
-          {monthlyPaymentCrossoverDate ? formatDuration(monthlyPaymentCrossoverDate.totalMonths) : "Never"}
+        <div className="text-2xl font-bold text-white tracking-tight">
+          {formatCurrency(summary.finalRenterNetWorth)}
         </div>
       </MetricCard>
 
-      <div className="flex flex-col gap-4">
-        <MetricCard
-            title={`Net Worth Diff (${inputs.simulationYears}Y)`}
-            icon={PiggyBank}
-            className="flex-1"
-            subtext={isBuyingBetter ? "Advantage to Buying" : "Advantage to Renting"}
-        >
-          <div className={cn(
-              "text-2xl font-bold tracking-tight",
-              isBuyingBetter ? "text-emerald-400" : "text-rose-400"
-          )}>
-            {isBuyingBetter ? "+" : ""}{formatCurrency(netWorthDiff)}
-          </div>
-        </MetricCard>
+      <MetricCard
+        title={`Net Worth Difference`}
+        icon={PiggyBank}
+        subtext={isBuyingBetter ? "Advantage to Buying" : "Advantage to Renting"}
+      >
+        <div className={cn(
+            "text-2xl font-bold tracking-tight",
+            isBuyingBetter ? "text-emerald-400" : "text-rose-400"
+        )}>
+          {isBuyingBetter ? "+" : ""}{formatCurrency(netWorthDiff)}
+        </div>
+      </MetricCard>
 
-        <MetricCard title="Renter Contributions" className="flex-1" icon={Wallet}>
-            <div className="space-y-1.5 mt-1">
-                <div className="flex justify-between items-center text-xs">
-                    <span className="text-zinc-500">Initial Capital</span>
-                    <span className="text-zinc-200 font-mono">{formatCurrency(summary.renterTotalInitialContribution)}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                    <span className="text-zinc-500">Monthly Savings</span>
-                    <span className="text-zinc-200 font-mono">{formatCurrency(summary.renterTotalContinuousContribution)}</span>
-                </div>
-            </div>
-        </MetricCard>
-      </div>
-
-      <div className="flex flex-col gap-4">
-        <MetricCard
-            title="Total Interest"
-            icon={Receipt}
-            className="flex-1"
-            subtext={`Paid over ${inputs.simulationYears} years`}
-        >
-          <div className="text-2xl font-bold text-white tracking-tight">
-            {formatCurrency(summary.totalInterestPaid)}
-          </div>
-        </MetricCard>
-
-        <MetricCard title="Renter Yield" className="flex-1" icon={ArrowRightLeft}>
-            <div className="space-y-1.5 mt-1">
-                <div className="flex justify-between items-center text-xs">
-                    <span className="text-zinc-500">On Initial</span>
-                    <span className="text-zinc-200 font-mono">{formatCurrency(summary.renterTotalInitialYield)}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                    <span className="text-zinc-500">On Monthly</span>
-                    <span className="text-zinc-200 font-mono">{formatCurrency(summary.renterTotalContinuousYield)}</span>
-                </div>
-            </div>
-        </MetricCard>
-      </div>
+      <MetricCard
+        title="Equity Crossover"
+        icon={TrendingUp}
+        subtext="Time to beat renting"
+      >
+        <div className="text-2xl font-bold text-white tracking-tight">
+          {crossoverDate ? formatDuration(crossoverDate.totalMonths) : "Never"}
+        </div>
+      </MetricCard>
 
     </div>
   );

@@ -35,6 +35,7 @@ export const DEFAULT_INPUTS: SimulationParams = {
   grossIncome: 115000,
   federalTaxRate: 22.0,
   stateTaxRate: 9.3,
+  contribution401k: 0,
   incomeGrowthRate: 3.0,
   itemizedDeductionRate: 0, // Default to standard deduction (0% itemized benefit assumed initially)
 };

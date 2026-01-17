@@ -326,6 +326,17 @@ export const Sidebar = () => {
                 inputClassName="w-32"
             />
             <SimulationInputGroup
+                label="401k Contribution"
+                tooltip="Annual pre-tax 401k contribution."
+                value={inputs.contribution401k}
+                onChange={update('contribution401k')}
+                min={0}
+                max={75000}
+                step={500}
+                prefix="$"
+                inputClassName="w-32"
+            />
+            <SimulationInputGroup
                 label="Federal Tax"
                 tooltip="Effective federal income tax rate."
                 value={inputs.federalTaxRate}
